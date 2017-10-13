@@ -8,13 +8,15 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import db.MemberDAO;
 import db.MemberDTO;
 
 public class Login_GUI extends JFrame implements ActionListener {
-	JTextField idtf, pwtf;
+	JTextField idtf;
+	JPasswordField pwtf;
 	JButton logB, regB;
 	JLabel idlb, pwlb;
 
@@ -23,14 +25,10 @@ public class Login_GUI extends JFrame implements ActionListener {
 		pwlb = new JLabel("PW : ");
 
 		idtf = new JTextField(10);
-		pwtf = new JTextField(10);
+		pwtf = new JPasswordField(10);
 
 		logB = new JButton("로그인");
 		regB = new JButton("회원가입");
-
-		JPanel idP = new JPanel();
-		idP.add(idlb);
-		idP.add(idtf);
 
 		JPanel pwP = new JPanel();
 		pwP.add(pwlb);
@@ -39,6 +37,10 @@ public class Login_GUI extends JFrame implements ActionListener {
 		JPanel btnP = new JPanel();
 		btnP.add(logB);
 		btnP.add(regB);
+
+		JPanel idP = new JPanel();
+		idP.add(idlb);
+		idP.add(idtf);
 
 		JPanel top = new JPanel();
 		top.add(idP);
@@ -57,8 +59,32 @@ public class Login_GUI extends JFrame implements ActionListener {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 
+	private void memberLogin() {
+		MemberDTO dto = new MemberDTO();
+		MemberDAO dao = MemberDAO.getInstance();
+
+		dto.setMemberId(idtf.getText());
+		dto.setMemberPassword(Integer.valueOf(pwtf.getText()));
+
+		if (dao.memberExist(dto)) {
+
+			if (dao.checkPassword(dto)) {
+				JOptionPane.showMessageDialog(this, "로그인 성공.");
+			} else {
+				JOptionPane.showMessageDialog(this, "비밀번호 오류.");
+				return;
+			}
+
+		} else {
+			JOptionPane.showMessageDialog(this, "회원 가입 하세요.");
+			return;
+		}
+
+	} // 로그인 체크
+
 	public class RegisterFrame extends JFrame implements ActionListener {
-		JTextField idtf2, pwtf2, namef;
+		JTextField idtf2, namef;
+		JPasswordField pwtf2;
 		JLabel idlb2, pwlb2, namelb;
 		JButton okB, cancelB;
 
@@ -69,14 +95,11 @@ public class Login_GUI extends JFrame implements ActionListener {
 
 			namef = new JTextField(10);
 			idtf2 = new JTextField(10);
-			pwtf2 = new JTextField(10);
+			pwtf2 = new JPasswordField(10);
+			pwtf2.setEchoChar('*');
 
 			okB = new JButton("확인");
 			cancelB = new JButton("취소");
-
-			JPanel nameP = new JPanel();
-			nameP.add(namelb);
-			nameP.add(namef);
 
 			JPanel idP = new JPanel();
 			idP.add(idlb2);
@@ -86,14 +109,19 @@ public class Login_GUI extends JFrame implements ActionListener {
 			pwP.add(pwlb2);
 			pwP.add(pwtf2);
 
+			JPanel nameP = new JPanel();
+			nameP.add(namelb);
+			nameP.add(namef);
+
 			JPanel btnP = new JPanel();
 			btnP.add(okB);
 			btnP.add(cancelB);
 
 			JPanel top = new JPanel();
-			top.add(nameP);
+
 			top.add(idP);
 			top.add(pwP);
+			top.add(nameP);
 			top.add(btnP);
 
 			add(top);
@@ -112,9 +140,11 @@ public class Login_GUI extends JFrame implements ActionListener {
 			Object obj = e.getSource();
 
 			if (obj == okB) {
-				memberJoin();
-			} else if (obj == cancelB) {
 
+				memberJoin();
+
+			} else if (obj == cancelB) {
+				this.dispose();
 			}
 
 		}
@@ -123,18 +153,31 @@ public class Login_GUI extends JFrame implements ActionListener {
 			MemberDTO dto = new MemberDTO();
 			MemberDAO dao = MemberDAO.getInstance();
 
+			if (idtf2.getText() == null || namef.getText() == null || Integer.valueOf(pwtf2.getEchoChar()) == null) {
+				JOptionPane.showMessageDialog(this, "정보를 입력해주세요.");
+				return;
+			}
 			dto.setMemberId(idtf2.getText());
 			dto.setMemberName(namef.getText());
-			dto.setMemberPassword(Integer.valueOf(pwtf2.getText()));
+			dto.setMemberPassword(Integer.valueOf(pwtf2.getEchoChar()));
 
 			if (dao.memberExist(dto)) {
 				JOptionPane.showMessageDialog(this, "이미 존재하는 회원입니다.");
-				return;
+				clean();
+			} else {
+				dao.insertMember(dto);
+				JOptionPane.showMessageDialog(this, "회원가입에 성공하였습니다.");
+				clean();
 			}
+		} // 회원가입 메소드
 
-			dao.insertMember(dto);
-			JOptionPane.showMessageDialog(this, "회원가입에 성공하였습니다.");
-		}
+		private void clean() {
+			idtf2.setText("");
+			namef.setText("");
+			pwtf2.setText("");
+			idtf2.requestFocus();
+		} // 입력창 비우기
+
 	}
 
 	public static void main(String[] args) {
@@ -147,7 +190,7 @@ public class Login_GUI extends JFrame implements ActionListener {
 		Object obj = e.getSource();
 
 		if (obj == logB) {
-
+			memberLogin();
 		} else if (obj == regB) {
 			new RegisterFrame();
 		}

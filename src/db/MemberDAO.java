@@ -86,6 +86,18 @@ public class MemberDAO {
 		return false;
 	}
 
+	public boolean checkPassword(MemberDTO memDTO) {
+		ArrayList<MemberDTO> aList = new ArrayList<MemberDTO>();
+		aList = (ArrayList<MemberDTO>) memberList();
+
+		for (int i = 0; i < aList.size(); i++) {
+			if (aList.get(i).getMemberPassword() == memDTO.getMemberPassword())
+				return true;
+		}
+
+		return false;
+	}
+
 	public List<MemberDTO> memberList() {
 		List<MemberDTO> aList = new ArrayList<MemberDTO>();
 		try {
