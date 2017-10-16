@@ -64,7 +64,7 @@ public class Login_GUI extends JFrame implements ActionListener {
 		MemberDAO dao = MemberDAO.getInstance();
 
 		dto.setMemberId(idtf.getText());
-		dto.setMemberPassword(Integer.valueOf(pwtf.getText()));
+		dto.setMemberPassword(Integer.valueOf(pwtf.getPassword().toString()));
 
 		if (dao.memberExist(dto)) {
 
