@@ -1,4 +1,4 @@
-package db;
+package CharServer.src;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -57,8 +57,7 @@ public class MemberDAO {
 			String sql = "INSERT INTO member (mem_code, mem_id, mem_name, mem_password) VALUES (mem_code_seq.nextval, ?,?,?)";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, memDTO.getMemberId());
-			pstmt.setString(2, memDTO.getMemberName());
-			pstmt.setInt(3, memDTO.getMemberPassword());
+			pstmt.setString(2, memDTO.getMemberPassword());
 			pstmt.executeQuery();
 
 		} catch (ClassNotFoundException | SQLException e) {
@@ -72,31 +71,38 @@ public class MemberDAO {
 			}
 		}
 
-	}
+	} // 회원가입
 
-	public boolean memberExist(MemberDTO memDTO) {
+	public boolean loginEx(String name, String password) {
 		ArrayList<MemberDTO> aList = new ArrayList<MemberDTO>();
 		aList = (ArrayList<MemberDTO>) memberList();
 
 		for (int i = 0; i < aList.size(); i++) {
-			if (aList.get(i).getMemberId().trim().equals(memDTO.getMemberId().trim()))
-				return true;
+			if (aList.get(i).getMemberId().trim().equals(name)) {
+				if (aList.get(i).getMemberPassword().equals(password)) { // 비밀번호 체크
+					System.out.println(aList.get(i).getMemberPassword());
+					return true;
+				} else {
+					break;
+					// 비밀번호 오류 , 서버에서 오류메세지 전송
+				}
+			}
 		}
 
 		return false;
-	}
+	} // 회원 존재 여부 확인
 
-	public boolean checkPassword(MemberDTO memDTO) {
+	public boolean memberShipEx(String name) {
 		ArrayList<MemberDTO> aList = new ArrayList<MemberDTO>();
 		aList = (ArrayList<MemberDTO>) memberList();
 
 		for (int i = 0; i < aList.size(); i++) {
-			if (aList.get(i).getMemberPassword() == memDTO.getMemberPassword())
+			if (aList.get(i).getMemberId().trim().equals(name))
 				return true;
 		}
 
 		return false;
-	}
+	} // 회원 존재 여부 확인
 
 	public List<MemberDTO> memberList() {
 		List<MemberDTO> aList = new ArrayList<MemberDTO>();
@@ -108,10 +114,8 @@ public class MemberDAO {
 			while (rs.next()) {
 				MemberDTO mdto = new MemberDTO();
 
-				mdto.setMemberCode(rs.getInt("mem_code"));
 				mdto.setMemberId(rs.getString("mem_id"));
-				mdto.setMemberName(rs.getString("mem_name"));
-				mdto.setMemberPassword(rs.getInt("mem_password"));
+				mdto.setMemberPassword(rs.getString("mem_password"));
 				aList.add(mdto);
 			}
 
@@ -126,6 +130,5 @@ public class MemberDAO {
 		}
 
 		return aList;
-	}
-
+	} // 회원 조회
 }

@@ -2,7 +2,7 @@ CREATE TABLE member(
 	mem_code number primary key,
 	mem_id varchar2(50) not null,
 	mem_name varchar2(50) unique,
-	mem_password number not null
+	mem_password varchar2(50) not null
 );
 
 CREATE sequence mem_code_seq
