@@ -8,20 +8,20 @@ public class ChatServer {
 	public static void main(String[] args) {
 		try {
 			ServerSocket serverSocket = new ServerSocket(555);
-			System.out.println("辑滚 积己吝...");
+			System.out.println("靹滊矂 鞐措");
 
 			Socket socket = null;
 
 			while (true) {
 				try {
-					System.out.println("辑滚矫累");
+					System.out.println("雽�旮办");
 					socket = serverSocket.accept();
 
-					System.out.println("家墓积己 : " + socket.getLocalAddress());
+					System.out.println("鞐瓣舶靹标车 : " + socket.getLocalAddress());
 					serverThread ServerThread = new serverThread(socket);
 					ServerThread.start();
 				} catch (IOException ex) {
-					System.err.println("ServerThread 积己角菩\n" + ex);
+					System.err.println("ServerThread 鞓る\n" + ex);
 					try {
 						if (socket != null) {
 							socket.close();
@@ -34,7 +34,7 @@ public class ChatServer {
 				}
 			}
 		} catch (IOException e) {
-			System.out.println("捞固 辑滚 积己吝");
+			System.out.println("鞓る靸濎劚");
 		}
 	}
 

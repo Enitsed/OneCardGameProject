@@ -10,6 +10,8 @@ import java.io.*;
 import java.net.Socket;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
 import java.util.StringTokenizer;
 
 /**
@@ -32,7 +34,7 @@ public class serverThread extends Thread implements CommonConstant {
 	private StringBuffer buf;
 
 	private Socket socket;
-	private String LoginID;
+	private String loginID;
 	private WaitingRoom waitingRoom;
 
 	public serverThread(Socket socket) {
@@ -104,15 +106,16 @@ public class serverThread extends Thread implements CommonConstant {
 				int cmd = Integer.parseInt((st.nextToken()));
 				switch (cmd) {
 				case LOGIN_REQUEST: {
-					LoginID = st.nextToken();
-					buf.setLength(0);
+					loginID = st.nextToken();
 
-					MemberDAO md = MemberDAO.getInstance();
-					if (md.loginEx(st.nextToken(), st.nextToken())) {
+					MemberDAO dao = MemberDAO.getInstance();
+					MemberDTO dto = new MemberDTO();
+
+					if (dao.login(dto)) {
 						buf.append(LOGIN_SUCCESS);
 						buf.append(SEPA);
 						send(buf.toString());
-						waitingRoom.addUser(LoginID, this);
+						waitingRoom.addUser(loginID, this);
 						SendUserList();
 					} else {
 						buf.append(LOGIN_FAIL);
@@ -122,23 +125,34 @@ public class serverThread extends Thread implements CommonConstant {
 
 					break;
 				}
-				case MEMBERSHIP: {
-					MemberDAO md = MemberDAO.getInstance();
-					if (md.memberShipEx(st.nextToken())) {
-						buf.append(MEMBERSHIP_SUCCESS);
-						buf.append(SEPA);
-					} else {
-						buf.append(MEMBERSHIP_FAIL);
-						buf.append(SEPA);
-					}
+				case REGISTER: {
+					MemberDAO dao = MemberDAO.getInstance();
+					MemberDTO dto = new MemberDTO();
 
+					dto.setMemberId(st.nextToken());
+					dto.setMemberName(st.nextToken());
+					dto.setMemberGender(st.nextToken());
+					dto.setMemberAge(Integer.valueOf(st.nextToken()));
+					dto.setMemberEmail(st.nextToken());
+					dto.setMemberLocation(st.nextToken());
+					dto.setMemberPassword(st.nextToken());
+
+					if (dao.memberShipChk(dto)) { // 아이디가 있음.
+						buf.append(MEMBERSHIP_SUCCESS);
+					} else { // 없을때
+						dao.insertMember(dto); // 데이타베이스에 회원 추가
+						buf.append(REGISTER_SUCCESS);
+					}
+					send(buf.toString());
+
+					break;
 				}
 
 				case LOGOUT_REQUEST: {
 					buf.setLength(0);
 					buf.append(LOGOUT_SUCCESS);
 					send(buf.toString());
-					System.out.println("'" + LoginID + "' 濡쒓렇�븘�썐 �듅�씤!\n");
+					System.out.println("'" + loginID + "' 로그아웃 되었습니다!\n");
 
 					new Exception();
 

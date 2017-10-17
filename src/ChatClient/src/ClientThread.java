@@ -5,10 +5,13 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.sql.Date;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
 import javax.swing.JOptionPane;
+
+import CharServer.src.MemberDTO;
 
 public class ClientThread extends Thread implements CommonConstant {
 
@@ -42,8 +45,8 @@ public class ClientThread extends Thread implements CommonConstant {
 
 			selfThread = this;
 		} catch (IOException e) {
-			JOptionPane.showConfirmDialog(null, "���� ���� ����" + e + "\n ä�ù��� �����մϴ�.", "�α���",
-					JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showConfirmDialog(null, "서버가 열려있지않습니다" + e + "\n 서버서버.", "�α���", JOptionPane.CLOSED_OPTION,
+					JOptionPane.ERROR_MESSAGE);
 			System.exit(0);
 		}
 	}
@@ -72,17 +75,35 @@ public class ClientThread extends Thread implements CommonConstant {
 					 */
 				}
 				case MEMBERSHIP_SUCCESS: {
-					JOptionPane.showConfirmDialog(null, "회원가입에 실패했습니다.", "메세지", JOptionPane.CLOSED_OPTION,
-							JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(null, "이미 회원가입이 되어 있습니다.");
 					break;
 				}
+				case REGISTER_SUCCESS: {
+					JOptionPane.showMessageDialog(null, "회원가입에 성공하였습니다.");
+					break;
+				}
+
+				case MEMBERSHIP_FAIL: {
+					JOptionPane.showMessageDialog(null, "회원가입 하세요.");
+				}
+
 				case ROOMLIST: {
 					// StringTokenizer st_test2 = new StringTokenizer(st.nextToken(), SEPA);//new
 					// StringTokenizer("USER1|USER2|USER3|USER4", SEPA);
 
-					Vector roomList = new Vector<>();
+					Vector<MemberDTO> roomList = new Vector<MemberDTO>();
 					while (st.hasMoreTokens()) {
-						roomList.addElement(st.nextToken());
+						MemberDTO dto = new MemberDTO();
+						dto.setMemberId(st.nextToken());
+						dto.setMemberPassword(st.nextToken());
+						dto.setMemberName(st.nextToken());
+						dto.setMemberGender(st.nextToken());
+						dto.setMemberAge(Integer.valueOf(st.nextToken()));
+						dto.setMemberEmail(st.nextToken());
+						dto.setMemberLocation(st.nextToken());
+						dto.setMemberJoinDate(Date.valueOf(st.nextToken()));
+
+						roomList.addElement(dto);
 					}
 
 					UiWaitRoom.UserList.setListData(roomList);
@@ -93,9 +114,12 @@ public class ClientThread extends Thread implements CommonConstant {
 				case WAITUSERLIST: {
 					StringTokenizer st1 = new StringTokenizer(st.nextToken(), ",");
 
-					Vector userList = new Vector<>();
+					Vector<MemberDTO> userList = new Vector<MemberDTO>();
 					while (st1.hasMoreTokens()) {
-						userList.addElement(st1.nextToken());
+						MemberDTO dto = new MemberDTO();
+						dto.setMemberId(st1.nextToken());
+						dto.setMemberPassword(st1.nextToken());
+						userList.addElement(dto);
 					}
 
 					UiWaitRoom.UserList.setListData(userList);
@@ -141,15 +165,18 @@ public class ClientThread extends Thread implements CommonConstant {
 
 				case ROOMUSERLIST: {
 					StringTokenizer st1 = new StringTokenizer(st.nextToken(), ",");
-					Vector userlist = new Vector<>();
+					Vector<MemberDTO> userlist = new Vector<MemberDTO>();
+
 					while (st1.hasMoreTokens()) {
-						userlist.addElement(st1.nextToken());
+						MemberDTO dto = new MemberDTO();
+						dto.setMemberId(st1.nextToken());
+						dto.setMemberPassword(st1.nextToken());
+						userlist.addElement(dto);
 					}
 
 					UiChattingRoom.listMember.setListData(userlist);
 					;
-
-					UiChattingRoom.taChatting.append(" ok ");
+					UIChattingRoom.taChatting.append(" ok ");
 					break;
 				}
 				case LOGOUT_SUCCESS: {
@@ -209,21 +236,23 @@ public class ClientThread extends Thread implements CommonConstant {
 		System.exit(0);
 	}
 
-	public void login(String id, String password) {
-		UserID = id;
+	// 클라이언트 스레드 로그인 메서드
+	public void login(MemberDTO dto) {
+		UserID = dto.getMemberId();
 
-		int ans = JOptionPane.showConfirmDialog(null, "'" + id + "'로 로그인을 하시겠습니까?", "메세지", JOptionPane.YES_NO_OPTION,
-				JOptionPane.QUESTION_MESSAGE);
+		int ans = JOptionPane.showConfirmDialog(null, "'" + UserID + "'로 로그인을 하시겠습니까?", "메세지",
+				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 		if (ans == JOptionPane.YES_OPTION) {
 			buf.setLength(0);
 			buf.append(LOGIN_REQUEST);
 			buf.append(SEPA);
-			buf.append(id);
+			buf.append(UserID);
 			buf.append(SEPA);
-			buf.append(password);
+			buf.append(dto.getMemberPassword());
 			send(buf.toString());
 
 			System.out.println("login" + buf.toString());
+
 		} else if (ans == JOptionPane.NO_OPTION) {
 			JOptionPane.showConfirmDialog(null, "접속을 종료합니다.", "메세지", JOptionPane.CLOSED_OPTION,
 					JOptionPane.INFORMATION_MESSAGE);
@@ -231,25 +260,38 @@ public class ClientThread extends Thread implements CommonConstant {
 		}
 	}
 
-	public boolean memberShip(String id, String password) {
-		int ans = JOptionPane.showConfirmDialog(null, "'" + id + "'로 로그인을 하시겠습니까?", "메세지", JOptionPane.YES_NO_OPTION,
-				JOptionPane.QUESTION_MESSAGE);
+	public void register(MemberDTO dto) {
+		int ans = JOptionPane.showConfirmDialog(null, "'" + dto.getMemberId() + "로 회원가입을 하시겠습니까?", "메세지",
+				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+
 		if (ans == JOptionPane.YES_OPTION) {
 			buf.setLength(0);
-			buf.append(MEMBERSHIP);
+			buf.append(REGISTER);
 			buf.append(SEPA);
-			buf.append(id);
+			buf.append(dto.getMemberId());
 			buf.append(SEPA);
-			buf.append(password);
+			buf.append(dto.getMemberName());
+			buf.append(SEPA);
+			buf.append(dto.getMemberGender());
+			buf.append(SEPA);
+			buf.append(dto.getMemberAge());
+			buf.append(SEPA);
+			buf.append(dto.getMemberEmail());
+			buf.append(SEPA);
+			buf.append(dto.getMemberLocation());
+			buf.append(SEPA);
+			buf.append(String.valueOf(dto.getMemberPassword()));
+			buf.append(SEPA);
+
 			send(buf.toString());
-			System.out.println("login" + buf.toString());
+			System.out.printf("%s, %s, %s, %d, %s, %s, %s", dto.getMemberId(), dto.getMemberName(),
+					dto.getMemberGender(), dto.getMemberAge(), dto.getMemberEmail(), dto.getMemberLocation(),
+					dto.getMemberPassword());
 		} else if (ans == JOptionPane.NO_OPTION) {
 			JOptionPane.showConfirmDialog(null, "접속을 종료합니다.", "메세지", JOptionPane.CLOSED_OPTION,
 					JOptionPane.INFORMATION_MESSAGE);
 			System.exit(0);
 		}
-		return false;
-
 	}
 
 	public void logOut() {

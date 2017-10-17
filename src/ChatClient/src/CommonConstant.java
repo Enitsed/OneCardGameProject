@@ -20,5 +20,7 @@ public interface CommonConstant {
 	public static final int MEMBERSHIP_SUCCESS = 15;
 	public static final int MEMBERSHIP_FAIL = 16;
 	public static final int MEMBERSHIP = 17;
+	public static final int REGISTER = 18;
+	public static final int REGISTER_SUCCESS = 19;
 
 }

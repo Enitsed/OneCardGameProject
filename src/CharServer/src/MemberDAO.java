@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +30,8 @@ public class MemberDAO {
 	private Connection init() throws ClassNotFoundException, SQLException {
 		Class.forName("oracle.jdbc.OracleDriver");
 
-		String url = "jdbc:oracle:thin://@127.0.0.1:1521:xe";
+		String url = "jdbc:oracle:thin:@127.0.0.1:1521:xe";
+
 		String username = "hr";
 		String password = "a1234";
 		conn = DriverManager.getConnection(url, username, password);
@@ -51,13 +53,24 @@ public class MemberDAO {
 			conn.close();
 	}
 
-	public void insertMember(MemberDTO memDTO) {
+	public void insertMember(MemberDTO dto) {
 		try {
+			System.out.printf("%s, %s, %s, %d, %s, %s, %s", dto.getMemberId(), dto.getMemberName(),
+					dto.getMemberGender(), dto.getMemberAge(), dto.getMemberEmail(), dto.getMemberLocation(),
+					dto.getMemberPassword());
+
 			conn = init();
-			String sql = "INSERT INTO member (mem_code, mem_id, mem_name, mem_password) VALUES (mem_code_seq.nextval, ?,?,?)";
+			String sql = "INSERT INTO mem_info (id, name, sex, age, email, location, join_date, password) VALUES (?,?,?,?,?,?,?,?)";
 			pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, memDTO.getMemberId());
-			pstmt.setString(2, memDTO.getMemberPassword());
+			pstmt.setString(1, dto.getMemberId());
+			pstmt.setString(2, dto.getMemberName());
+			pstmt.setString(3, dto.getMemberGender());
+			pstmt.setInt(4, dto.getMemberAge());
+			pstmt.setString(5, dto.getMemberEmail());
+			pstmt.setString(6, dto.getMemberLocation());
+			pstmt.setTimestamp(7, new Timestamp(System.currentTimeMillis()));
+			pstmt.setString(8, dto.getMemberPassword());
+
 			pstmt.executeQuery();
 
 		} catch (ClassNotFoundException | SQLException e) {
@@ -71,52 +84,62 @@ public class MemberDAO {
 			}
 		}
 
-	} // »∏ø¯∞°¿‘
+	} // ÌöåÏõêÍ∞ÄÏûÖ Î©îÏÑúÎìú
 
-	public boolean loginEx(String name, String password) {
+	public boolean login(MemberDTO dto) {
+
 		ArrayList<MemberDTO> aList = new ArrayList<MemberDTO>();
 		aList = (ArrayList<MemberDTO>) memberList();
 
 		for (int i = 0; i < aList.size(); i++) {
-			if (aList.get(i).getMemberId().trim().equals(name)) {
-				if (aList.get(i).getMemberPassword().equals(password)) { // ∫Òπ–π¯»£ √º≈©
+			if (aList.get(i).getMemberId().trim().equals(dto.getMemberId())) {
+				if (aList.get(i).getMemberPassword().equals(dto.getMemberPassword())) { // ÔøΩÔøΩ–πÔøΩ»£ √º≈©
 					System.out.println(aList.get(i).getMemberPassword());
-					return true;
+
+					return true; // Î°úÍ∑∏Ïù∏ ÏÑ±Í≥µ
 				} else {
 					break;
-					// ∫Òπ–π¯»£ ø¿∑˘ , º≠πˆø°º≠ ø¿∑˘∏ﬁºº¡ˆ ¿¸º€
+					// Î°úÍ∑∏Ïù∏ Ïã§Ìå® ÎπÑÎ∞ÄÎ≤àÌò∏ Ïò§Î•ò
 				}
 			}
-		}
+		} // Î°úÍ∑∏Ïù∏ ÏïÑÏù¥Îîî Î∞è ÎπÑÎ∞ÄÎ≤àÌò∏ ÌôïÏù∏
 
 		return false;
-	} // »∏ø¯ ¡∏¿Á ø©∫Œ »Æ¿Œ
+	} // Î°úÍ∑∏Ïù∏ Î©îÏÑúÎìú
 
-	public boolean memberShipEx(String name) {
+	public boolean memberShipChk(MemberDTO dto) {
+
 		ArrayList<MemberDTO> aList = new ArrayList<MemberDTO>();
 		aList = (ArrayList<MemberDTO>) memberList();
 
 		for (int i = 0; i < aList.size(); i++) {
-			if (aList.get(i).getMemberId().trim().equals(name))
-				return true;
+			if (aList.get(i).getMemberId().trim().equals(dto.getMemberId()))
+				return true; // ÏûàÏäµÎãàÎã§.
 		}
 
-		return false;
-	} // »∏ø¯ ¡∏¿Á ø©∫Œ »Æ¿Œ
+		return false; // ÏóÜÏäµÎãàÎã§.
+	} // ÌöåÏõêÏù∏ÏßÄ ÏïÑÎãåÏßÄ ÌôïÏù∏ IDÎ°ú Ï°∞Ìöå
 
 	public List<MemberDTO> memberList() {
 		List<MemberDTO> aList = new ArrayList<MemberDTO>();
 		try {
 			conn = init();
 			stmt = conn.createStatement();
-			String sql = "SELECT *" + " FROM member";
+			String sql = "SELECT *" + " FROM mem_info";
 			rs = stmt.executeQuery(sql);
 			while (rs.next()) {
-				MemberDTO mdto = new MemberDTO();
+				MemberDTO dto = new MemberDTO();
 
-				mdto.setMemberId(rs.getString("mem_id"));
-				mdto.setMemberPassword(rs.getString("mem_password"));
-				aList.add(mdto);
+				dto.setMemberId(rs.getString("id"));
+				dto.setMemberPassword(rs.getString("password"));
+				dto.setMemberName(rs.getString("name"));
+				dto.setMemberGender(rs.getString("sex"));
+				dto.setMemberAge(rs.getInt("age"));
+				dto.setMemberEmail(rs.getString("email"));
+				dto.setMemberLocation(rs.getString("location"));
+				dto.setMemberJoinDate(rs.getDate("join_date"));
+
+				aList.add(dto);
 			}
 
 		} catch (ClassNotFoundException | SQLException e) {
@@ -130,5 +153,5 @@ public class MemberDAO {
 		}
 
 		return aList;
-	} // »∏ø¯ ¡∂»∏
+	} // Î©§Î≤Ñ Î¶¨Ïä§Ìä∏ Ï°∞Ìöå
 }

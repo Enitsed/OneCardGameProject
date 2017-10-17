@@ -4,6 +4,9 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
+
+import CharServer.src.MemberDTO;
+
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.border.BevelBorder;
@@ -18,8 +21,8 @@ import java.util.StringTokenizer;
 import java.awt.event.ActionEvent;
 
 public class UIWaitRoom extends JFrame implements ActionListener, MouseListener {
-	public JList UserList;
-	public JList roomList;
+	public JList<MemberDTO> UserList;
+	public JList<MemberDTO> roomList;
 	public JButton btnLogout;
 	public JButton btnJoin;
 	public JButton btnCreateRoom;

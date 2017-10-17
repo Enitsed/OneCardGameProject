@@ -2,13 +2,19 @@ package ChatClient.src;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+import javax.swing.ButtonGroup;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+
+import CharServer.src.MemberDTO;
 
 class Login extends JFrame implements ActionListener {
 	JTextField idtf;
@@ -60,29 +66,52 @@ class Login extends JFrame implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		Object obj = e.getSource();
 		if (obj == logB) {
-			ct.login(idtf.getText(), pwtf.getPassword().toString());
+			MemberDTO dto = new MemberDTO();
+			ct.login(dto);
 		} else if (obj == regB) {
-			new RegisterFrame();
+			new RegisterFrame(ct);
 		}
 
 	}
 }
 
 class RegisterFrame extends JFrame implements ActionListener {
-	JTextField idtf2, namef;
+	JTextField idtf2, namef, agef, emailf;
 	JPasswordField pwtf2;
-	JLabel idlb2, pwlb2, namelb;
+	JLabel idlb2, pwlb2, namelb, agelb, emaillb, sexlb, loclb;
+	JRadioButton manR, womanR;
+	DefaultComboBoxModel<Object> locModel;
+	JComboBox<Object> locC;
 	JButton okB, cancelB;
+	Object[] locStr = { "경기", "경상도", "충청도", "전라도", "강원도" };
+	ClientThread ct;
 
-	public RegisterFrame() {
+	public RegisterFrame(ClientThread ct) {
+		this.ct = ct;
+
 		namelb = new JLabel("이름 : ");
 		idlb2 = new JLabel("ID : ");
 		pwlb2 = new JLabel("PW : ");
+		agelb = new JLabel("나이 : ");
+		emaillb = new JLabel("이메일 : ");
+		loclb = new JLabel("지역 : ");
+		sexlb = new JLabel("성별 : ");
 
 		namef = new JTextField(10);
 		idtf2 = new JTextField(10);
+		agef = new JTextField(10);
+		emailf = new JTextField(10);
 		pwtf2 = new JPasswordField(10);
 		pwtf2.setEchoChar('*');
+
+		manR = new JRadioButton("남", true);
+		womanR = new JRadioButton("여");
+		ButtonGroup genderRadio = new ButtonGroup();
+		genderRadio.add(manR);
+		genderRadio.add(womanR);
+
+		locModel = new DefaultComboBoxModel<Object>(locStr);
+		locC = new JComboBox<Object>(locModel);
 
 		okB = new JButton("확인");
 		cancelB = new JButton("취소");
@@ -99,6 +128,23 @@ class RegisterFrame extends JFrame implements ActionListener {
 		nameP.add(namelb);
 		nameP.add(namef);
 
+		JPanel ageP = new JPanel();
+		ageP.add(agelb);
+		ageP.add(agef);
+
+		JPanel sexP = new JPanel();
+		sexP.add(sexlb);
+		sexP.add(manR);
+		sexP.add(womanR);
+
+		JPanel emailP = new JPanel();
+		emailP.add(emaillb);
+		emailP.add(emailf);
+
+		JPanel locP = new JPanel();
+		locP.add(loclb);
+		locP.add(locC);
+
 		JPanel btnP = new JPanel();
 		btnP.add(okB);
 		btnP.add(cancelB);
@@ -108,6 +154,10 @@ class RegisterFrame extends JFrame implements ActionListener {
 		top.add(idP);
 		top.add(pwP);
 		top.add(nameP);
+		top.add(ageP);
+		top.add(sexP);
+		top.add(emailP);
+		top.add(locP);
 		top.add(btnP);
 
 		add(top);
@@ -126,17 +176,23 @@ class RegisterFrame extends JFrame implements ActionListener {
 		Object obj = e.getSource();
 
 		if (obj == okB) {
-			// MemberDAO dao = MemberDAO.getInstance();
-			// MemberDTO dto = new MemberDTO();
-			//
-			// if (dao.memberExist(dto)) {
-			// dao.insertMember(dto);
-			// JOptionPane.showMessageDialog(this, "회원 가입에 성공하였습니다.");
-			// }
+			// 회원가입 메소드
+			MemberDTO dto = new MemberDTO();
+			dto.setMemberId(idtf2.getText());
+			dto.setMemberName(namef.getText());
+			dto.setMemberGender(manR.isSelected() ? "남" : "여");
+			dto.setMemberAge(Integer.valueOf(agef.getText()));
+			dto.setMemberEmail(emailf.getText());
+			dto.setMemberLocation(locC.getSelectedItem().toString());
+			dto.setMemberPassword(pwtf2.getPassword().toString());
+
+			System.out.printf("%s, %s, %s, %d, %s, %s, %s", dto.getMemberId(), dto.getMemberName(),
+					dto.getMemberGender(), dto.getMemberAge(), dto.getMemberEmail(), dto.getMemberLocation(),
+					dto.getMemberPassword());
+			ct.register(dto);
 		} else if (obj == cancelB) {
 			this.dispose();
 		}
-
 	}
 
 	private void clean() {
