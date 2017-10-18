@@ -17,7 +17,8 @@ public class ChattingRoom {
 	private String password;
 	private int isLocked;
 
-	public ChattingRoom(int roomNo, String UserID, String roomTitle, int roomMaxUser, int isLocked, String roomPassword) {
+	public ChattingRoom(int roomNo, String UserID, String roomTitle, int roomMaxUser, int isLocked,
+			String roomPassword) {
 		this.roomTitle = roomTitle;
 		this.AdminID = AdminID;
 		this.MaxMamber = roomMaxUser;

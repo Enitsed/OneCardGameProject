@@ -66,9 +66,9 @@ class Login extends JFrame implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		Object obj = e.getSource();
 		if (obj == logB) {
-			MemberDTO dto = new MemberDTO();
-			
-			ct.login(dto);
+			String id = idtf.getText();
+			char[] password = pwtf.getPassword();
+			ct.login(id, password);
 		} else if (obj == regB) {
 			new RegisterFrame(ct);
 		}
@@ -185,12 +185,13 @@ class RegisterFrame extends JFrame implements ActionListener {
 			dto.setMemberAge(Integer.valueOf(agef.getText()));
 			dto.setMemberEmail(emailf.getText());
 			dto.setMemberLocation(locC.getSelectedItem().toString());
-			dto.setMemberPassword(pwtf2.getPassword().toString());
+			dto.setMemberPassword(String.valueOf(pwtf2.getPassword()));
 
 			System.out.printf("%s, %s, %s, %d, %s, %s, %s", dto.getMemberId(), dto.getMemberName(),
 					dto.getMemberGender(), dto.getMemberAge(), dto.getMemberEmail(), dto.getMemberLocation(),
 					dto.getMemberPassword());
 			ct.register(dto);
+
 			clean();
 		} else if (obj == cancelB) {
 			this.dispose();
@@ -201,6 +202,10 @@ class RegisterFrame extends JFrame implements ActionListener {
 		idtf2.setText("");
 		namef.setText("");
 		pwtf2.setText("");
+		emailf.setText("");
+		agef.setText("");
+		manR.setSelected(true);
+		locC.setSelectedIndex(0);
 		idtf2.requestFocus();
 	} // 입력창 비우기
 }

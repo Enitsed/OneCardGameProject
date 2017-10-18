@@ -147,8 +147,7 @@ public class UIWaitRoom extends JFrame implements ActionListener, MouseListener 
 			UICreateRoom UiCreateRoom = new UICreateRoom(clientThread);
 		} else if (e.getSource() == btnJoin) {
 			if (!isSelected) {
-				JOptionPane.showMessageDialog(this, "������ ���� ������ �ּ���", "������", JOptionPane.ERROR_MESSAGE);
-
+				JOptionPane.showMessageDialog(this, "방을 선택하지 않았습니다. 방을 선택하세요", "채팅방 입장", JOptionPane.ERROR_MESSAGE);
 			}
 
 			clientThread.JoinChattingRoom(roomNo, "0");

@@ -55,10 +55,6 @@ public class MemberDAO {
 
 	public void insertMember(MemberDTO dto) {
 		try {
-			System.out.printf("%s, %s, %s, %d, %s, %s, %s", dto.getMemberId(), dto.getMemberName(),
-					dto.getMemberGender(), dto.getMemberAge(), dto.getMemberEmail(), dto.getMemberLocation(),
-					dto.getMemberPassword());
-
 			conn = init();
 			String sql = "INSERT INTO mem_info (id, name, sex, age, email, location, join_date, password) VALUES (?,?,?,?,?,?,?,?)";
 			pstmt = conn.prepareStatement(sql);
@@ -93,8 +89,10 @@ public class MemberDAO {
 
 		for (int i = 0; i < aList.size(); i++) {
 			if (aList.get(i).getMemberId().trim().equals(dto.getMemberId())) {
-				if (aList.get(i).getMemberPassword().equals(dto.getMemberPassword())) { // ��й�ȣ üũ
+				if (aList.get(i).getMemberPassword().equals(dto.getMemberPassword())) { // 비밀번호 확인
 					System.out.println(aList.get(i).getMemberPassword());
+					updateClientInfO(dto);
+
 					return true; // 로그인 성공
 				} else {
 					break;
@@ -105,6 +103,39 @@ public class MemberDAO {
 
 		return false;
 	} // 로그인 메서드
+
+	private void updateClientInfO(MemberDTO dto) {
+		try {
+			conn = init();
+			String sql = "SELECT * FROM mem_info m WHERE m.id = ? AND m.password = ?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, dto.getMemberId());
+			pstmt.setString(2, dto.getMemberPassword());
+			rs = pstmt.executeQuery();
+
+			while (rs.next()) {
+				dto.setMemberId(rs.getString("id"));
+				dto.setMemberPassword(rs.getString("password"));
+				dto.setMemberName(rs.getString("name"));
+				dto.setMemberGender(rs.getString("sex"));
+				dto.setMemberAge(rs.getInt("age"));
+				dto.setMemberEmail(rs.getString("email"));
+				dto.setMemberLocation(rs.getString("location"));
+				dto.setMemberJoinDate(rs.getDate("join_date"));
+			}
+
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				rs.close();
+				pstmt.close();
+				conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
 	public boolean memberShipChk(MemberDTO dto) {
 

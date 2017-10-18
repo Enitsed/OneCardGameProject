@@ -118,7 +118,6 @@ public class ClientThread extends Thread implements CommonConstant {
 					while (st1.hasMoreTokens()) {
 						MemberDTO dto = new MemberDTO();
 						dto.setMemberId(st1.nextToken());
-						dto.setMemberPassword(st1.nextToken());
 						userList.addElement(dto);
 					}
 
@@ -237,8 +236,8 @@ public class ClientThread extends Thread implements CommonConstant {
 	}
 
 	// 클라이언트 스레드 로그인 메서드
-	public void login(MemberDTO dto) {
-		UserID = dto.getMemberId();
+	public void login(String id, char[] password) {
+		UserID = id;
 
 		int ans = JOptionPane.showConfirmDialog(null, "'" + UserID + "'로 로그인을 하시겠습니까?", "메세지",
 				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
@@ -248,10 +247,10 @@ public class ClientThread extends Thread implements CommonConstant {
 			buf.append(SEPA);
 			buf.append(UserID);
 			buf.append(SEPA);
-			buf.append(dto.getMemberPassword());
+			buf.append(password);
 			send(buf.toString());
 
-			System.out.println("login" + buf.toString());
+			System.out.println("login" + buf);
 
 		} else if (ans == JOptionPane.NO_OPTION) {
 			JOptionPane.showConfirmDialog(null, "접속을 종료합니다.", "메세지", JOptionPane.CLOSED_OPTION,
@@ -284,13 +283,10 @@ public class ClientThread extends Thread implements CommonConstant {
 			buf.append(SEPA);
 
 			send(buf.toString());
-			System.out.printf("%s, %s, %s, %d, %s, %s, %s", dto.getMemberId(), dto.getMemberName(),
-					dto.getMemberGender(), dto.getMemberAge(), dto.getMemberEmail(), dto.getMemberLocation(),
-					dto.getMemberPassword());
+
 		} else if (ans == JOptionPane.NO_OPTION) {
-			JOptionPane.showConfirmDialog(null, "접속을 종료합니다.", "메세지", JOptionPane.CLOSED_OPTION,
-					JOptionPane.INFORMATION_MESSAGE);
-			System.exit(0);
+			JOptionPane.showMessageDialog(null, "회원가입을 취소하셨습니다.");
+			return;
 		}
 	}
 

@@ -34,7 +34,7 @@ public class ChatServer {
 				}
 			}
 		} catch (IOException e) {
-			System.out.println("오류생성");
+			System.out.println("이미 서버가 존재합니다.");
 		}
 	}
 

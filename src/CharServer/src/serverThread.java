@@ -34,7 +34,8 @@ public class serverThread extends Thread implements CommonConstant {
 	private StringBuffer buf;
 
 	private Socket socket;
-	private String loginID;
+	private String loginId;
+
 	private WaitingRoom waitingRoom;
 
 	public serverThread(Socket socket) {
@@ -106,19 +107,19 @@ public class serverThread extends Thread implements CommonConstant {
 				int cmd = Integer.parseInt((st.nextToken()));
 				switch (cmd) {
 				case LOGIN_REQUEST: {
-					loginID = st.nextToken();
+					loginId = st.nextToken();
+					String loginPassword = st.nextToken();
 
 					MemberDAO dao = MemberDAO.getInstance();
 					MemberDTO dto = new MemberDTO();
+					dto.setMemberId(loginId);
+					dto.setMemberPassword(loginPassword);
 
 					if (dao.login(dto)) {
-						
-						
-						
 						buf.append(LOGIN_SUCCESS);
 						buf.append(SEPA);
 						send(buf.toString());
-						waitingRoom.addUser(loginID, this);
+						waitingRoom.addUser(dto.getMemberId(), this);
 						SendUserList();
 					} else {
 						buf.append(LOGIN_FAIL);
@@ -143,9 +144,12 @@ public class serverThread extends Thread implements CommonConstant {
 					if (dao.memberShipChk(dto)) { // 아이디가 있음.
 						buf.append(MEMBERSHIP_SUCCESS);
 					} else { // 없을때
+						System.out.println("회원 가입 요청" + buf + "데이터베이스에 등록시도");
 						dao.insertMember(dto); // 데이타베이스에 회원 추가
 						buf.append(REGISTER_SUCCESS);
+						System.out.println("등록 성공");
 					}
+
 					send(buf.toString());
 
 					break;
@@ -155,7 +159,7 @@ public class serverThread extends Thread implements CommonConstant {
 					buf.setLength(0);
 					buf.append(LOGOUT_SUCCESS);
 					send(buf.toString());
-					System.out.println("'" + loginID + "' 로그아웃 되었습니다!\n");
+					System.out.println("'" + loginId + "' 로그아웃 되었습니다!\n");
 
 					new Exception();
 

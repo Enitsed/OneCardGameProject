@@ -20,7 +20,6 @@ CREATE TABLE mem_info(
 INSERT INTO mem_info (id, name, sex, age, email, location, join_date, password)
 VALUES ('khacademy', '정우', '남', 26, 'jeongwo@naver.com', '수원', sysdate, 'khacademy');
 
-
 select * from mem_info
 
 CREATE TABLE game_room(
