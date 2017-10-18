@@ -67,6 +67,7 @@ class Login extends JFrame implements ActionListener {
 		Object obj = e.getSource();
 		if (obj == logB) {
 			MemberDTO dto = new MemberDTO();
+			
 			ct.login(dto);
 		} else if (obj == regB) {
 			new RegisterFrame(ct);
@@ -190,6 +191,7 @@ class RegisterFrame extends JFrame implements ActionListener {
 					dto.getMemberGender(), dto.getMemberAge(), dto.getMemberEmail(), dto.getMemberLocation(),
 					dto.getMemberPassword());
 			ct.register(dto);
+			clean();
 		} else if (obj == cancelB) {
 			this.dispose();
 		}

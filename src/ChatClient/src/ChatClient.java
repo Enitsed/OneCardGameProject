@@ -1,9 +1,5 @@
 package ChatClient.src;
 
-import java.io.IOException;
-
-import javax.swing.JOptionPane;
-
 public class ChatClient {
 
 	public static void main(String[] args) {

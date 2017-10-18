@@ -95,7 +95,6 @@ public class MemberDAO {
 			if (aList.get(i).getMemberId().trim().equals(dto.getMemberId())) {
 				if (aList.get(i).getMemberPassword().equals(dto.getMemberPassword())) { // ��й�ȣ üũ
 					System.out.println(aList.get(i).getMemberPassword());
-
 					return true; // 로그인 성공
 				} else {
 					break;

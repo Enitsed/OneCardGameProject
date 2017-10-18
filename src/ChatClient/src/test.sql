@@ -1,3 +1,9 @@
+conn sys/a1234 as sysdba
+연결성공
+grant all on hr.mem_info to hr;
+
+-- 권한부여
+
 CREATE TABLE mem_info(
    id varchar2(20) primary key,
    password varchar2(20) not null,

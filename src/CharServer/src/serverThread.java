@@ -112,6 +112,9 @@ public class serverThread extends Thread implements CommonConstant {
 					MemberDTO dto = new MemberDTO();
 
 					if (dao.login(dto)) {
+						
+						
+						
 						buf.append(LOGIN_SUCCESS);
 						buf.append(SEPA);
 						send(buf.toString());
