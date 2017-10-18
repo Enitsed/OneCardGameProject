@@ -91,7 +91,7 @@ public class MemberDAO {
 			if (aList.get(i).getMemberId().trim().equals(dto.getMemberId())) {
 				if (aList.get(i).getMemberPassword().equals(dto.getMemberPassword())) { // 비밀번호 확인
 					System.out.println(aList.get(i).getMemberPassword());
-					updateClientInfO(dto);
+					GetClientInfO(dto);
 
 					return true; // 로그인 성공
 				} else {
@@ -104,7 +104,7 @@ public class MemberDAO {
 		return false;
 	} // 로그인 메서드
 
-	private void updateClientInfO(MemberDTO dto) {
+	private MemberDTO GetClientInfO(MemberDTO dto) {
 		try {
 			conn = init();
 			String sql = "SELECT * FROM mem_info m WHERE m.id = ? AND m.password = ?";
@@ -135,6 +135,10 @@ public class MemberDAO {
 				e.printStackTrace();
 			}
 		}
+		if(dto.getMemberId().equals(null)) {
+			System.exit(0);
+		}
+		return dto;
 	}
 
 	public boolean memberShipChk(MemberDTO dto) {

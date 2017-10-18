@@ -19,10 +19,10 @@ public class ChattingRoom {
 	private int isLocked;
 	GameLogic lg;
 
-	public ChattingRoom(int roomNo, String UserID, String roomTitle, int roomMaxUser, int isLocked, String roomPassword,
+	public ChattingRoom(int roomNo, MemberDTO dto, String roomTitle, int roomMaxUser, int isLocked, String roomPassword,
 			GameLogic lg) {
 		this.roomTitle = roomTitle;
-		this.AdminID = AdminID;
+		this.AdminID = dto.getMemberId();
 		this.MaxMamber = roomMaxUser;
 		this.isLocked = isLocked;
 		this.password = roomPassword;
@@ -32,11 +32,11 @@ public class ChattingRoom {
 		users = new Hashtable<String, ServerThread>(MaxMamber);
 	}
 
-	public boolean addUser(String id, ServerThread serverThread) {
+	public boolean addUser(MemberDTO dto, ServerThread serverThread) {
 		if (users.size() == MaxMamber)
 			return false;
 
-		users.put(id, serverThread);
+		users.put(dto.getMemberId(), serverThread);
 		return true;
 	}
 

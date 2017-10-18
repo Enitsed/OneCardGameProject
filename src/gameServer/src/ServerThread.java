@@ -45,6 +45,8 @@ public class ServerThread extends Thread implements CommonConstant {
 
 	private WaitingRoom waitingRoom;
 
+	private static MemberDAO dao = MemberDAO.getInstance();
+
 	public ServerThread(Socket socket) {
 		try {
 			selectShape = "";
@@ -187,10 +189,12 @@ public class ServerThread extends Thread implements CommonConstant {
 				}
 
 				case LOGOUT_REQUEST: {
+					loginId = st.nextToken();
+					System.out.println("'" + loginId + "' 로그아웃 되었습니다!\n");
+
 					buf.setLength(0);
 					buf.append(LOGOUT_SUCCESS);
 					send(buf.toString());
-					System.out.println("'" + loginId + "' 로그아웃 되었습니다!\n");
 
 					break;
 				}
@@ -251,11 +255,13 @@ public class ServerThread extends Thread implements CommonConstant {
 					isLocked = Integer.parseInt(st.nextToken());
 					roomPassword = st.nextToken();
 
-					ChattingRoom chattingRoom = new ChattingRoom(waitingRoom.getRoomsCount() + 1, UserID, roomTitle,
+					MemberDTO dto = new MemberDTO();
+
+					ChattingRoom chattingRoom = new ChattingRoom(waitingRoom.getRoomsCount() + 1, dto, roomTitle,
 							roomMaxUser, isLocked, roomPassword, lg);
 					if (waitingRoom.addRoom(chattingRoom) == 0) {
-						chattingRoom.addUser(UserID, this);
-						waitingRoom.delUser(UserID);
+						chattingRoom.addUser(dto, this);
+						waitingRoom.delUser(dto);
 
 						buf.setLength(0);
 						buf.append(CREATEROOM_SUCCESS);
@@ -299,7 +305,7 @@ public class ServerThread extends Thread implements CommonConstant {
 				} // end switch-case
 			}
 		} catch (IOException e) {
-			System.out.println("switch case 에러");
+			System.out.println("접속자가 종료하였습니다.");
 
 			try {
 				if (output != null) {

@@ -28,10 +28,10 @@ public class ClientThread extends Thread implements CommonConstant {
 
 	private Thread selfThread;
 
-	private String UserID;
+	private String userID;
 
-	private UIWaitRoom UiWaitRoom;
-	private UIChattingRoom UiChattingRoom;
+	private UIWaitRoom uiWaitRoom;
+	private UIChattingRoom uiChattingRoom;
 	private Login lg;
 
 	private MemberDTO dto;
@@ -47,6 +47,7 @@ public class ClientThread extends Thread implements CommonConstant {
 			dto = new MemberDTO();
 
 			selfThread = this;
+
 		} catch (IOException e) {
 			JOptionPane.showConfirmDialog(null, "서버가 열려있지않습니다" + e + "\n 서버서버.", "�α���", JOptionPane.CLOSED_OPTION,
 					JOptionPane.ERROR_MESSAGE);
@@ -66,9 +67,9 @@ public class ClientThread extends Thread implements CommonConstant {
 				case LOGIN_SUCCESS: {
 					JOptionPane.showConfirmDialog(null, "로그인이 완료 되었습니다.", "메세지", JOptionPane.CLOSED_OPTION,
 							JOptionPane.INFORMATION_MESSAGE);
-					UiWaitRoom = new UIWaitRoom(this);
-
+					uiWaitRoom = new UIWaitRoom(this);
 					lg.dispose();
+
 					break;
 					/*
 					 * StringTokenizer st_test = new StringTokenizer("USER1|USER2|USER3|USER4",
@@ -102,8 +103,8 @@ public class ClientThread extends Thread implements CommonConstant {
 						roomList.addElement(st.nextToken());
 					}
 
-					UiWaitRoom.UserList.setListData(roomList);
-					UiWaitRoom.setVisible(true);
+					uiWaitRoom.UserList.setListData(roomList);
+					uiWaitRoom.setVisible(true);
 
 					break;
 				}
@@ -116,33 +117,33 @@ public class ClientThread extends Thread implements CommonConstant {
 						userList.addElement(dto);
 					}
 
-					UiWaitRoom.UserList.setListData(userList);
-					UiWaitRoom.setVisible(true);
+					uiWaitRoom.UserList.setListData(userList);
+					uiWaitRoom.setVisible(true);
 
 					break;
 				}
 				case CREATEROOM_SUCCESS: {
-					UiWaitRoom.setVisible(false);
+					uiWaitRoom.setVisible(false);
 
-					if (UiChattingRoom == null) {
-						UiChattingRoom = new UIChattingRoom(this);
+					if (uiChattingRoom == null) {
+						uiChattingRoom = new UIChattingRoom(this);
 					}
-					UiChattingRoom.AdminID = UserID;
-					UiChattingRoom.roomNo = Integer.parseInt(st.nextToken());
-					UiChattingRoom.ClearData();
-					UiChattingRoom.setVisible(true);
+					uiChattingRoom.AdminID = userID;
+					uiChattingRoom.roomNo = Integer.parseInt(st.nextToken());
+					uiChattingRoom.ClearData();
+					uiChattingRoom.setVisible(true);
 
 					break;
 				}
 				case JOINROOM_SUCCESS: {
-					UiWaitRoom.setVisible(false);
+					uiWaitRoom.setVisible(false);
 
-					if (UiChattingRoom == null) {
-						UiChattingRoom = new UIChattingRoom(this);
+					if (uiChattingRoom == null) {
+						uiChattingRoom = new UIChattingRoom(this);
 					}
-					UiChattingRoom.roomNo = Integer.parseInt(st.nextToken());
-					UiChattingRoom.ClearData();
-					UiChattingRoom.setVisible(true);
+					uiChattingRoom.roomNo = Integer.parseInt(st.nextToken());
+					uiChattingRoom.ClearData();
+					uiChattingRoom.setVisible(true);
 
 					break;
 				}
@@ -166,14 +167,14 @@ public class ClientThread extends Thread implements CommonConstant {
 						userlist.addElement(dto);
 					}
 
-					UiChattingRoom.listMember.setListData(userlist);
+					uiChattingRoom.listMember.setListData(userlist);
 					UIChattingRoom.taChatting.append(" ok ");
 					break;
 				}
 				case LOGOUT_SUCCESS: {
 					JOptionPane.showConfirmDialog(null, "로그아웃 성공", "메세지", JOptionPane.CLOSED_OPTION,
 							JOptionPane.ERROR_MESSAGE);
-					UiWaitRoom.dispose();
+					uiWaitRoom.dispose();
 					new Login(this);
 					break;
 				}
@@ -258,15 +259,15 @@ public class ClientThread extends Thread implements CommonConstant {
 
 	// 클라이언트 스레드 로그인 메서드
 	public void login(String id, char[] password) {
-		UserID = id;
+		userID = id;
 
-		int ans = JOptionPane.showConfirmDialog(null, "'" + UserID + "'로 로그인을 하시겠습니까?", "메세지",
+		int ans = JOptionPane.showConfirmDialog(null, "'" + userID + "'로 로그인을 하시겠습니까?", "메세지",
 				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 		if (ans == JOptionPane.YES_OPTION) {
 			buf.setLength(0);
 			buf.append(LOGIN_REQUEST);
 			buf.append(SEPA);
-			buf.append(UserID);
+			buf.append(userID);
 			buf.append(SEPA);
 			buf.append(password);
 			send(buf.toString());
@@ -315,7 +316,7 @@ public class ClientThread extends Thread implements CommonConstant {
 		buf.setLength(0);
 		buf.append(LOGOUT_REQUEST);
 		buf.append(SEPA);
-		buf.append(UserID);
+		buf.append(userID);
 		send(buf.toString());
 	}
 
@@ -323,7 +324,7 @@ public class ClientThread extends Thread implements CommonConstant {
 		buf.setLength(0);
 		buf.append(CREATEROOM_REQUEST);
 		buf.append(SEPA);
-		buf.append(UserID);
+		buf.append(userID);
 		buf.append(SEPA);
 		buf.append(title);
 		buf.append(SEPA);
@@ -340,7 +341,7 @@ public class ClientThread extends Thread implements CommonConstant {
 		buf.setLength(0);
 		buf.append(JOINROOM);
 		buf.append(SEPA);
-		buf.append(UserID);
+		buf.append(userID);
 		buf.append(SEPA);
 		buf.append(roomNo);
 		buf.append(SEPA);
@@ -353,9 +354,9 @@ public class ClientThread extends Thread implements CommonConstant {
 		buf.setLength(0);
 		buf.append(SENDWORD);
 		buf.append(SEPA);
-		buf.append(UserID);
+		buf.append(userID);
 		buf.append(SEPA);
-		buf.append(UiChattingRoom.roomNo);
+		buf.append(uiChattingRoom.roomNo);
 		buf.append(SEPA);
 		buf.append(msg);
 		send(buf.toString());

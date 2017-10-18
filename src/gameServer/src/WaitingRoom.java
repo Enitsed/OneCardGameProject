@@ -11,16 +11,18 @@ import java.util.Hashtable;
 
 public class WaitingRoom implements CommonConstant {
 
-	private static Hashtable users;
-	private static Hashtable rooms;
+	private static Hashtable<String, ServerThread> users;
+	private static Hashtable<Integer, ChattingRoom> rooms;
 
 	private static final int ERR_USERFULL = -1;
 	private static final int ERR_EXISTID = -2;
 	private static final int ERR_ROOMFULL = -3;
 
+	private MemberDTO dto = new MemberDTO();
+
 	static {
-		users = new Hashtable<Integer, MemberDTO>(100);
-		rooms = new Hashtable<Integer, Integer>(10);
+		users = new Hashtable<String, ServerThread>(100);
+		rooms = new Hashtable<Integer, ChattingRoom>(10);
 	}
 
 	public WaitingRoom() {
@@ -40,11 +42,11 @@ public class WaitingRoom implements CommonConstant {
 		users.put(dto.getMemberId(), serverThread);
 
 		return 0;
-	}
+	} // 로그인 성공시에 클라이언트 객체를 유저 리스트에 추가한다.
 
-	public void delUser(String id) {
-		users.remove(id);
-	}
+	public void delUser(MemberDTO dto) {
+		users.remove(dto);
+	} // 클라이언트 객체를 삭제한다.
 
 	public int addRoom(ChattingRoom chattingRoom) {
 		if (rooms.size() == 10)
@@ -97,8 +99,8 @@ public class WaitingRoom implements CommonConstant {
 		return roomsInfo;
 	}
 
-	public String getRoomInfo(int roomNuber) {
-		ChattingRoom chattingRoom = (ChattingRoom) rooms.get(roomNuber);
+	public String getRoomInfo(int roomNo) {
+		ChattingRoom chattingRoom = (ChattingRoom) rooms.get(roomNo);
 		return chattingRoom.getUserList();
 	}
 
@@ -118,7 +120,7 @@ public class WaitingRoom implements CommonConstant {
 	public boolean joinRoom(ServerThread serverThread, String UserID, int roomNo, String password) {
 		ChattingRoom chattingRoom = (ChattingRoom) rooms.get(roomNo);
 
-		chattingRoom.addUser(UserID, serverThread);
+		chattingRoom.addUser(dto, serverThread);
 
 		return true;
 	}

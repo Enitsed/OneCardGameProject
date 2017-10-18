@@ -35,8 +35,7 @@ public class UIWaitRoom extends JFrame implements ActionListener, MouseListener 
 
 	public UIWaitRoom(ClientThread clientThread) {
 		this.clientThread = clientThread;
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 539, 370);
+
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -53,7 +52,7 @@ public class UIWaitRoom extends JFrame implements ActionListener, MouseListener 
 		list.setBounds(105, 22, 0, 0);
 		panel.add(list);
 
-		UserList = new JList();
+		UserList = new JList<MemberDTO>();
 		UserList.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		UserList.setBounds(12, 21, 115, 203);
 		panel.add(UserList);
@@ -124,6 +123,10 @@ public class UIWaitRoom extends JFrame implements ActionListener, MouseListener 
 		btnJoin.setBounds(163, 254, 129, 36);
 		btnJoin.addActionListener(this);
 		contentPane.add(btnJoin);
+
+		setBounds(100, 100, 539, 370);
+		setVisible(true);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 
 	@Override
