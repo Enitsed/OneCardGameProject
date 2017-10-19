@@ -18,10 +18,10 @@ public class ChattingRoom {
 	private String adminId;
 	private String password;
 	private int isLocked;
-	GameLogic lg;
+	GameLogic logic;
 
 	public ChattingRoom(int roomNo, MemberDTO dto, String roomTitle, int roomMaxUser, int isLocked, String roomPassword,
-			GameLogic lg) {
+			GameLogic logic) {
 		this.roomNo = roomNo;
 		this.roomTitle = roomTitle;
 		this.adminId = dto.getMemberId();
@@ -29,7 +29,7 @@ public class ChattingRoom {
 		this.isLocked = isLocked;
 		this.password = roomPassword;
 		this.roomNo = roomNo;
-		this.lg = lg;
+		this.logic = logic;
 
 		users = new Hashtable<MemberDTO, ServerThread>(maxMember);
 	}
@@ -60,7 +60,7 @@ public class ChattingRoom {
 			ids = new String(buf);
 			ids = ids.substring(0, ids.length() - 1);
 		} catch (StringIndexOutOfBoundsException e) {
-			return "대기실 초과";
+			return "buf 문자열 오류";
 		}
 
 		return ids;
@@ -71,14 +71,14 @@ public class ChattingRoom {
 		buf.setLength(0);
 		buf.append(roomNo);
 		buf.append(",");
-		buf.append(memberCount);
+		buf.append(roomTitle);
 		buf.append(",");
-		buf.append(maxMember);
+		buf.append(memberCount + "/" + maxMember);
 		buf.append(",");
 		if (isLocked == 1)
-			buf.append("잠김");
+			buf.append("비공개");
 		else {
-			buf.append("열림");
+			buf.append("공개");
 		}
 
 		buf.append(",");
@@ -87,15 +87,8 @@ public class ChattingRoom {
 		return buf.toString();
 	}
 
-	public int GetRoomNo() {
+	public int getRoomNo() {
 		return roomNo;
 	}
 
-	public String getRoomTitle() {
-		return roomTitle;
-	}
-
-	public void setRoomTitle(String roomTitle) {
-		this.roomTitle = roomTitle;
-	}
 }

@@ -31,13 +31,19 @@ public class ClientThread extends Thread implements CommonConstant {
 
 	private Thread selfThread;
 
-	private String userID;
-
 	private UIWaitRoom uiWaitRoom;
 	private UIChattingRoom uiChattingRoom;
 	private Login lg;
 
 	private MemberDTO dto;
+
+	public MemberDTO getDto() {
+		return dto;
+	}
+
+	public void setDto(MemberDTO dto) {
+		this.dto = dto;
+	}
 
 	public ClientThread() {
 		try {
@@ -70,6 +76,14 @@ public class ClientThread extends Thread implements CommonConstant {
 					JOptionPane.showConfirmDialog(null, "로그인이 완료 되었습니다.", "메세지", JOptionPane.CLOSED_OPTION,
 							JOptionPane.INFORMATION_MESSAGE);
 					uiWaitRoom = new UIWaitRoom(this);
+
+					dto.setMemberId(st.nextToken());
+					dto.setMemberEmail(st.nextToken());
+					dto.setMemberName(st.nextToken());
+					dto.setMemberLocation(st.nextToken());
+					dto.setMemberAge(Integer.valueOf(st.nextToken()));
+					dto.setMemberGender(st.nextToken());
+
 					lg.dispose();
 
 					break;
@@ -112,19 +126,19 @@ public class ClientThread extends Thread implements CommonConstant {
 				}
 				case WAITUSERLIST: {
 					Vector<String> userList = new Vector<String>();
+					MemberDTO otherUser = new MemberDTO();
 					StringTokenizer st1 = new StringTokenizer(st.nextToken(), ",");
 					while (st1.hasMoreTokens()) {
 						StringTokenizer st2 = new StringTokenizer(st1.nextToken(), ":");
 						while (st2.hasMoreTokens()) {
-							dto.setMemberId(st2.nextToken().toString());
-							dto.setMemberName(st2.nextToken());
-							dto.setMemberGender(st2.nextToken());
-							dto.setMemberAge(Integer.valueOf(st2.nextToken()));
-							dto.setMemberEmail(st2.nextToken());
-							dto.setMemberLocation(st2.nextToken());
+							otherUser.setMemberId(st2.nextToken().toString());
+							otherUser.setMemberName(st2.nextToken());
+							otherUser.setMemberGender(st2.nextToken());
+							otherUser.setMemberAge(Integer.valueOf(st2.nextToken()));
+							otherUser.setMemberEmail(st2.nextToken());
+							otherUser.setMemberLocation(st2.nextToken());
 							Date date = new SimpleDateFormat("yyyy-MM-dd").parse(st2.nextToken());
-							dto.setMemberJoinDate(date);
-							dto.setMemberPassword(st2.nextToken());
+							otherUser.setMemberJoinDate(date);
 						}
 						userList.addElement(dto.getMemberId());
 					}
@@ -140,7 +154,7 @@ public class ClientThread extends Thread implements CommonConstant {
 					if (uiChattingRoom == null) {
 						uiChattingRoom = new UIChattingRoom(this);
 					}
-					uiChattingRoom.AdminID = userID;
+					uiChattingRoom.AdminID = dto.getMemberId();
 					uiChattingRoom.roomNo = Integer.parseInt(st.nextToken());
 					uiChattingRoom.ClearData();
 					uiChattingRoom.setVisible(true);
@@ -154,6 +168,8 @@ public class ClientThread extends Thread implements CommonConstant {
 						uiChattingRoom = new UIChattingRoom(this);
 					}
 					uiChattingRoom.roomNo = Integer.parseInt(st.nextToken());
+					uiChattingRoom.AdminID = st.nextToken();
+
 					uiChattingRoom.ClearData();
 					uiChattingRoom.setVisible(true);
 
@@ -172,15 +188,15 @@ public class ClientThread extends Thread implements CommonConstant {
 
 				case ROOMUSERLIST: {
 					StringTokenizer st1 = new StringTokenizer(st.nextToken(), ",");
-					Vector<MemberDTO> userlist = new Vector<MemberDTO>();
+					Vector<String> userlist = new Vector<String>();
 
 					while (st1.hasMoreTokens()) {
 						dto.setMemberId(st1.nextToken());
-						userlist.addElement(dto);
+						userlist.addElement(dto.getMemberId());
 					}
 
 					uiChattingRoom.listMember.setListData(userlist);
-					UIChattingRoom.taChatting.append(" ok ");
+					UIChattingRoom.taChatting.append(dto.getMemberId() + " 님이 입장하셨습니다. ");
 					break;
 				}
 				case LOGOUT_SUCCESS: {
@@ -222,6 +238,24 @@ public class ClientThread extends Thread implements CommonConstant {
 					} else {
 						UIChattingRoom.subCard.setIcon(new ImageIcon("src/img/" + st.nextToken() + ".jpg"));
 					}
+					break;
+				}
+				case CLOSECHATROOM_SUCCESS: {
+					uiWaitRoom = new UIWaitRoom(this);
+
+					uiChattingRoom.dispose();
+
+					JOptionPane.showConfirmDialog(null, "채팅방에서 나가셨습니다.", "메세지", JOptionPane.CLOSED_OPTION,
+							JOptionPane.INFORMATION_MESSAGE);
+					uiChattingRoom.taChatting.append("나가셨습니다 \n");
+					break;
+				}
+
+				case ENEMYCARD_INFORMATION: {
+					String num = st.nextToken();
+					String inf = st.nextToken();
+
+					uiChattingRoom.enemyCard(Integer.parseInt(num), Integer.parseInt(inf));
 					break;
 				}
 				} // switch-case
@@ -269,19 +303,44 @@ public class ClientThread extends Thread implements CommonConstant {
 		System.exit(0);
 	}
 
-	// 클라이언트 스레드 로그인 메서드
-	public void login(String id, char[] password) {
-		userID = id;
+	public void sendFire(String FireId) {
+		buf.setLength(0);
+		buf.append(FIRE);
+		buf.append(SEPA);
+		buf.append(uiChattingRoom.roomNo);
+		buf.append(SEPA);
+		buf.append(FireId);
+		send(buf.toString());
+	}
 
-		int ans = JOptionPane.showConfirmDialog(null, "'" + userID + "'로 로그인을 하시겠습니까?", "메세지",
+	public void closeChatRoom() {
+		int ans = JOptionPane.showConfirmDialog(null, "정말로 나가시겠습니까?", "메세지", JOptionPane.YES_NO_OPTION,
+				JOptionPane.QUESTION_MESSAGE);
+		if (ans == JOptionPane.YES_OPTION) {
+			buf.setLength(0);
+			buf.append(CLOSECHATROOM);
+			buf.append(SEPA);
+			buf.append(dto.getMemberId());
+			send(buf.toString());
+			System.out.println("CloseChatRoom" + buf.toString());
+		}
+	}
+
+	// 클라이언트 스레드 로그인 메서드
+	public void login(String id, String password) {
+
+		dto.setMemberId(id);
+		dto.setMemberPassword(password);
+
+		int ans = JOptionPane.showConfirmDialog(null, "'" + dto.getMemberId() + "'로 로그인을 하시겠습니까?", "메세지",
 				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 		if (ans == JOptionPane.YES_OPTION) {
 			buf.setLength(0);
 			buf.append(LOGIN_REQUEST);
 			buf.append(SEPA);
-			buf.append(userID);
+			buf.append(dto.getMemberId());
 			buf.append(SEPA);
-			buf.append(password);
+			buf.append(dto.getMemberPassword());
 			send(buf.toString());
 
 			System.out.println("login" + buf);
@@ -328,36 +387,36 @@ public class ClientThread extends Thread implements CommonConstant {
 		buf.setLength(0);
 		buf.append(LOGOUT_REQUEST);
 		buf.append(SEPA);
-		buf.append(userID);
+		buf.append(dto.getMemberId());
 		send(buf.toString());
 	}
 
-	public void CreateRoom(String title, int MaxUser, int isRock, String password) {
+	public void CreateRoom(String title, int maxUser, int isLocked, String roomPassword) {
 		buf.setLength(0);
 		buf.append(CREATEROOM_REQUEST);
 		buf.append(SEPA);
-		buf.append(userID);
+		buf.append(dto.getMemberId());
 		buf.append(SEPA);
 		buf.append(title);
 		buf.append(SEPA);
-		buf.append(MaxUser);
+		buf.append(maxUser);
 		buf.append(SEPA);
-		buf.append(isRock);
+		buf.append(isLocked);
 		buf.append(SEPA);
-		buf.append(password);
+		buf.append(roomPassword);
 		send(buf.toString());
 		System.out.println("CreateRoom" + buf.toString());
 	}
 
-	public void JoinChattingRoom(int roomNo, String password) {
+	public void JoinChattingRoom(int roomNo, String roomPassword) {
 		buf.setLength(0);
 		buf.append(JOINROOM);
 		buf.append(SEPA);
-		buf.append(userID);
+		buf.append(dto.getMemberId());
 		buf.append(SEPA);
 		buf.append(roomNo);
 		buf.append(SEPA);
-		buf.append(password);
+		buf.append(roomPassword);
 		send(buf.toString());
 		System.out.println("JoinChattingRoom" + buf.toString());
 	}
@@ -366,7 +425,7 @@ public class ClientThread extends Thread implements CommonConstant {
 		buf.setLength(0);
 		buf.append(SENDWORD);
 		buf.append(SEPA);
-		buf.append(userID);
+		buf.append(dto.getMemberId());
 		buf.append(SEPA);
 		buf.append(uiChattingRoom.roomNo);
 		buf.append(SEPA);

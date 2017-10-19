@@ -12,7 +12,7 @@ import java.util.Hashtable;
 public class WaitingRoom implements CommonConstant {
 
 	private static Hashtable<MemberDTO, ServerThread> users;
-	private static Hashtable<String, ChattingRoom> rooms;
+	private static Hashtable<Integer, ChattingRoom> rooms;
 
 	private static final int ERR_USERFULL = -1;
 	private static final int ERR_EXISTID = -2;
@@ -21,7 +21,7 @@ public class WaitingRoom implements CommonConstant {
 
 	static {
 		users = new Hashtable<MemberDTO, ServerThread>(100);
-		rooms = new Hashtable<String, ChattingRoom>(10);
+		rooms = new Hashtable<Integer, ChattingRoom>(10);
 	}
 
 	public WaitingRoom() {
@@ -50,7 +50,7 @@ public class WaitingRoom implements CommonConstant {
 		if (rooms.size() == 10)
 			return ERR_USERFULL;
 
-		rooms.put(chattingRoom.getRoomTitle(), chattingRoom);
+		rooms.put(chattingRoom.getRoomNo(), chattingRoom);
 
 		return 0;
 
@@ -80,11 +80,12 @@ public class WaitingRoom implements CommonConstant {
 
 	public String getRoomList() {
 		StringBuffer buf = new StringBuffer();
+		int roomNo;
 		String roomTitle;
-		Enumeration<String> eNum = rooms.keys();
+		Enumeration<Integer> eNum = rooms.keys();
 		while (eNum.hasMoreElements()) {
-			roomTitle = (String) eNum.nextElement();
-			ChattingRoom room = (ChattingRoom) rooms.get(roomTitle);
+			roomNo = (int) eNum.nextElement();
+			ChattingRoom room = (ChattingRoom) rooms.get(roomNo);
 			buf.append(room.toString());
 			buf.append(SEPA);
 		}
@@ -118,15 +119,30 @@ public class WaitingRoom implements CommonConstant {
 
 	public boolean joinRoom(ServerThread serverThread, String UserID, int roomNo, String password) {
 		ChattingRoom chattingRoom = (ChattingRoom) rooms.get(roomNo);
-
 		chattingRoom.addUser(dto, serverThread);
 
 		return true;
 	}
 
-	public ChattingRoom join(ServerThread serverThread, String UserID, int roomNo, String password) {
+	public ChattingRoom join(ServerThread serverThread, String UserID, String roomNo, String password) {
 		ChattingRoom chattingRoom = (ChattingRoom) rooms.get(roomNo);
 
 		return chattingRoom;
+	}
+
+	public void removeRooms(String roomTitle) {
+		if (roomTitle != null) {
+			ChattingRoom chattingRoom = (ChattingRoom) rooms.get(roomTitle);
+			if (chattingRoom.users.size() <= 0) {
+				rooms.remove(roomTitle);
+			}
+		}
+	}
+
+	public void removeChattingUser(MemberDTO dto, String roomTitle) {
+		if (roomTitle != null) {
+			ChattingRoom chattingRoom = (ChattingRoom) rooms.get(roomTitle);
+			chattingRoom.delUser(dto);
+		}
 	}
 }

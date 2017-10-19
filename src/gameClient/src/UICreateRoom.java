@@ -34,7 +34,7 @@ public class UICreateRoom extends JFrame implements ActionListener, ItemListener
 
 	private JRadioButton rbUnLocked;
 	private JRadioButton rbLocked;
-	private ButtonGroup rbRockGroup;
+	private ButtonGroup rbLockedGroup;
 
 	private JButton btnOk;
 	private JButton btnCancel;
@@ -118,9 +118,9 @@ public class UICreateRoom extends JFrame implements ActionListener, ItemListener
 		rbLocked.setBounds(75, 6, 61, 23);
 		panel_1.add(rbLocked);
 
-		rbRockGroup = new ButtonGroup();
-		rbRockGroup.add(rbLocked);
-		rbRockGroup.add(rbUnLocked);
+		rbLockedGroup = new ButtonGroup();
+		rbLockedGroup.add(rbLocked);
+		rbLockedGroup.add(rbUnLocked);
 
 		JLabel lblNewLabel_1 = new JLabel("비밀번호");
 		lblNewLabel_1.setBounds(12, 208, 57, 15);

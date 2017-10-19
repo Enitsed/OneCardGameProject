@@ -72,7 +72,7 @@ class Login extends JFrame implements ActionListener {
 		Object obj = e.getSource();
 		if (obj == logB) {
 			String id = idtf.getText();
-			char[] password = pwtf.getPassword();
+			String password = String.valueOf(pwtf.getPassword());
 			ct.login(id, password);
 		} else if (obj == regB) {
 			registerFrame = new RegisterFrame(ct);

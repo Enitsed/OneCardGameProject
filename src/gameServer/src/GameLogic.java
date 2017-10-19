@@ -1,18 +1,7 @@
 package gameServer.src;
 
-import java.awt.BorderLayout;
-import java.awt.Button;
-import java.io.IOException;
-import java.lang.reflect.Array;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Random;
-
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.border.Border;
 
 class GameLogic implements Runnable, CommonConstant {
 	ArrayList<ServerThread> pl = new ArrayList<>();
@@ -378,14 +367,13 @@ class GameLogic implements Runnable, CommonConstant {
 		cardDecADD();
 		shuffleCard();
 		turn = 0;
-		for (int i = 0; i < 5; i++) {
-			pl.get(0).setMyCard(mainCardDeck.get(0));
-			mainCardDeck.remove(0);
-		}
 
-		for (int i = 0; i < 5; i++) {
-			pl.get(1).setMyCard(mainCardDeck.get(0));
-			mainCardDeck.remove(0);
+		for (int i = 0; i < pl.size(); i++) {
+			pl.get(i).getMyCard().clear();
+			for (int j = 0; j < 5; j++) {
+				pl.get(i).setMyCard(mainCardDeck.get(0));
+				mainCardDeck.remove(0);
+			}
 		}
 
 		subCardDeck.add(mainCardDeck.get(0));
@@ -421,7 +409,7 @@ class GameLogic implements Runnable, CommonConstant {
 		int num = Integer.parseInt(str);
 
 		try {
-			if (num == 10 && pl.get(turn).getMyCard().size() < 10) {
+			if (num == 10) {
 				System.out.println("1. shape : " + nowShape);
 				System.out.println("1. num : " + nowNum);
 
@@ -453,20 +441,17 @@ class GameLogic implements Runnable, CommonConstant {
 			broadcast();
 
 		} catch (IndexOutOfBoundsException e) {
-			System.out.println("ㅁㅁ");
+			System.out.println("카드체크 메서드 오류");
 		}
 	}
 
 	public void endGame() {
-		int i;
-		if (turn + 1 >= total) {
-			i = 0;
-		} else {
-			i = turn + 1;
+		System.out.println("end Game");
+		for (int i = 0; i < pl.size(); i++) {
+			pl.get(i).setMyTurn(false);
 		}
-		if (pl.get(turn).getMyCard().size() <= 0 && pl.get(i).getMyCard().size() > 10) {
-			gameStart = false;
-		}
+		reset();
+		gameStart = false;
 	}
 
 	public void attackCheck(Card cd) {
@@ -502,10 +487,23 @@ class GameLogic implements Runnable, CommonConstant {
 
 	synchronized public void broadcast() {
 		String str2;
+		String str3;
 		if (subCardDeck.size() <= 0) {
 			str2 = SUBCARD_INFORMATION + SEPA;
 		} else {
 			str2 = SUBCARD_INFORMATION + SEPA + subCardDeck.get(0).getImgName();
+		}
+
+		str3 = ENEMYCARD_INFORMATION + SEPA;
+		for (int j = 0; j < pl.size(); j++) {
+			for (int i = 0; i < pl.size(); i++) {
+				if (!pl.get(j).equals(pl.get(i))) {
+					str3 += i + SEPA;
+					str3 += pl.get(i).getMyCard().size();
+					pl.get(j).send(str3);
+					str3 = ENEMYCARD_INFORMATION + SEPA;
+				}
+			}
 		}
 		for (int i = 0; i < pl.size(); i++) {
 			String str = MYCARD_INFORMATION + SEPA;
@@ -522,15 +520,16 @@ class GameLogic implements Runnable, CommonConstant {
 	}
 
 	public void run() {
-		System.out.println("a");
 		while (endGame) {
 			try {
 				th.sleep(100);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			if (gameStart == true) {
+				if (pl.size() < 2) {
+					endGame();
+				}
 			} else if (gameStart == false && pl.size() == 2) {
 				// System.out.println(pl.size());
 				System.out.println("gameStart");

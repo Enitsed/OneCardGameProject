@@ -11,8 +11,6 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
 import java.util.StringTokenizer;
 
 /**
@@ -41,14 +39,15 @@ public class ServerThread extends Thread implements CommonConstant {
 	private StringBuffer buf;
 
 	private Socket socket;
-	private String loginId;
 
 	private WaitingRoom waitingRoom;
-
+	private MemberDTO dto;
 	private static MemberDAO dao = MemberDAO.getInstance();
 
 	public ServerThread(Socket socket) {
 		try {
+			MemberDTO dto = new MemberDTO();
+
 			selectShape = "";
 			myTurn = false;
 			myCard = new ArrayList<>();
@@ -136,19 +135,27 @@ public class ServerThread extends Thread implements CommonConstant {
 				int cmd = Integer.parseInt((st.nextToken()));
 				switch (cmd) {
 				case LOGIN_REQUEST: {
-					loginId = st.nextToken();
-					String loginPassword = st.nextToken();
-
-					MemberDTO dto = new MemberDTO();
-
-					dto.setMemberId(loginId);
-					dto.setMemberPassword(loginPassword);
+					dto = new MemberDTO();
+					dto.setMemberId(st.nextToken());
+					dto.setMemberPassword(st.nextToken());
 
 					buf.setLength(0);
 
 					if (dao.login(dto)) {
 						buf.append(LOGIN_SUCCESS);
 						buf.append(SEPA);
+						buf.append(dto.getMemberId());
+						buf.append(SEPA);
+						buf.append(dto.getMemberEmail());
+						buf.append(SEPA);
+						buf.append(dto.getMemberName());
+						buf.append(SEPA);
+						buf.append(dto.getMemberLocation());
+						buf.append(SEPA);
+						buf.append(dto.getMemberAge());
+						buf.append(SEPA);
+						buf.append(dto.getMemberGender());
+
 						send(buf.toString());
 						dto = dao.GetClientInfo(dto);
 						waitingRoom.addUser(dto, this);
@@ -164,8 +171,6 @@ public class ServerThread extends Thread implements CommonConstant {
 				}
 
 				case REGISTER: {
-					MemberDAO dao = MemberDAO.getInstance();
-					MemberDTO dto = new MemberDTO();
 
 					dto.setMemberId(st.nextToken());
 					dto.setMemberName(st.nextToken());
@@ -191,8 +196,8 @@ public class ServerThread extends Thread implements CommonConstant {
 				}
 
 				case LOGOUT_REQUEST: {
-					loginId = st.nextToken();
-					System.out.println("'" + loginId + "' 로그아웃 되었습니다!\n");
+					dto.setMemberId(st.nextToken());
+					System.out.println("'" + dto.getMemberId() + "' 로그아웃 되었습니다!\n");
 
 					buf.setLength(0);
 					buf.append(LOGOUT_SUCCESS);
@@ -202,8 +207,8 @@ public class ServerThread extends Thread implements CommonConstant {
 				}
 				case JOINROOM: {
 					String UserID, password = "";
-					int roomNo;
 					boolean rst;
+					int roomNo;
 
 					UserID = st.nextToken();
 					roomNo = Integer.parseInt(st.nextToken());
@@ -221,7 +226,7 @@ public class ServerThread extends Thread implements CommonConstant {
 						SendRoomUserList(roomNo);
 					} else {
 						send(String.valueOf(JOINROOM_FAIL));
-						System.out.println("'" + UserID + "' JOINROOM �떎�뙣");
+						System.out.println("'" + UserID + "' 참여 실패");
 					}
 					break;
 				}
@@ -273,7 +278,7 @@ public class ServerThread extends Thread implements CommonConstant {
 
 						SendRoomList();
 
-						SendRoomUserList(chattingRoom.GetRoomNo());
+						SendRoomUserList(chattingRoom.getRoomNo());
 
 						System.out.println("'" + UserID + "' CREATEROOM_REQUEST �꽦怨�");
 					} else {

@@ -26,5 +26,8 @@ public interface CommonConstant {
 	public static final int SELECT_SHAPE = 21;
 	public static final int MYCARD_INFORMATION = 22;
 	public static final int SUBCARD_INFORMATION = 23;
-
+	public static final int CLOSECHATROOM = 24;
+	public static final int CLOSECHATROOM_SUCCESS = 25;
+	public static final int FIRE = 26;
+	public static final int ENEMYCARD_INFORMATION = 27;
 }

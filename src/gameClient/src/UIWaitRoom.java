@@ -5,8 +5,6 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
-import gameServer.src.MemberDTO;
-
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.border.BevelBorder;
@@ -148,14 +146,13 @@ public class UIWaitRoom extends JFrame implements ActionListener, MouseListener 
 	public void mouseClicked(MouseEvent e) {
 		isSelected = true;
 		String selectedRoomInfo = String.valueOf(((JList) e.getSource()).getSelectedValue());
-		StringTokenizer st = new StringTokenizer(selectedRoomInfo, ",");
-		roomNo = getSequence(roomNo);
-		roomTitle = st.nextToken();
+		if (!selectedRoomInfo.equals(null)) {
+			System.out.println("zz   " + selectedRoomInfo);
+			StringTokenizer st = new StringTokenizer(selectedRoomInfo, ",");
+			roomNo = Integer.parseInt(st.nextToken());
+			roomTitle = st.nextToken();
+		}
 	}
-
-	private int getSequence(int roomNo) {
-		return roomNo++;
-	} // 방의 번호를 1씩 올려준다.
 
 	@Override
 	public void mousePressed(MouseEvent e) {
