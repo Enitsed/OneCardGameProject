@@ -2,6 +2,8 @@ package gameClient.src;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
@@ -61,6 +63,7 @@ class Login extends JFrame implements ActionListener {
 		setTitle("로그인");
 		setSize(200, 200);
 		setVisible(true);
+		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 
@@ -80,98 +83,128 @@ class Login extends JFrame implements ActionListener {
 
 class RegisterFrame extends JFrame implements ActionListener {
 	JTextField idtf2, namef, agef, emailf;
-	JPasswordField pwtf2;
-	JLabel idlb2, pwlb2, namelb, agelb, emaillb, sexlb, loclb;
+	JPasswordField pwtf2, pwchktf;
+	JLabel idlb2, pwlb2, namelb, agelb, emaillb, sexlb, loclb, pwchklb;
 	JRadioButton manR, womanR;
 	DefaultComboBoxModel<Object> locModel;
 	JComboBox<Object> locC;
-	JButton okB, cancelB;
-	Object[] locStr = { "경기", "경상도", "충청도", "전라도", "강원도" };
+	JButton okB, cancelB, chkB;
+	Object[] locStr = { "서울", "경기도", "강원도", "경상도", "충청도", "전라도" };
 	ClientThread ct;
 
 	public RegisterFrame(ClientThread ct) {
 		this.ct = ct;
 
-		namelb = new JLabel("이름 : ");
-		idlb2 = new JLabel("ID : ");
-		pwlb2 = new JLabel("PW : ");
-		agelb = new JLabel("나이 : ");
-		emaillb = new JLabel("이메일 : ");
-		loclb = new JLabel("지역 : ");
-		sexlb = new JLabel("성별 : ");
+		JPanel idP = new JPanel();
 
-		namef = new JTextField(10);
-		idtf2 = new JTextField(10);
-		agef = new JTextField(10);
-		emailf = new JTextField(10);
-		pwtf2 = new JPasswordField(10);
+		// 아이디
+		idlb2 = new JLabel("아이디 : ");
+		idlb2.setBounds(30, 20, 100, 30);
+		add(idlb2);
+
+		idtf2 = new JTextField();
+		idtf2.setBounds(130, 20, 120, 25);
+		add(idtf2);
+
+		// 중복확인버튼
+		chkB = new JButton("중복확인");
+		chkB.setBounds(260, 20, 90, 30);
+		add(chkB);
+
+		// 비밀번호
+		pwlb2 = new JLabel("비밀번호 : ");
+		pwlb2.setBounds(30, 60, 100, 30);
+		add(pwlb2);
+
+		pwtf2 = new JPasswordField();
 		pwtf2.setEchoChar('*');
+		pwtf2.setBounds(130, 60, 120, 25);
+		add(pwtf2);
 
+		// 비밀번호 확인
+		pwchklb = new JLabel("비밀번호 확인 : ");
+		pwchklb.setBounds(30, 100, 100, 30);
+		add(pwchklb);
+
+		pwchktf = new JPasswordField();
+		pwchktf.setEchoChar('*');
+		pwchktf.setBounds(130, 100, 120, 25);
+		add(pwchktf);
+
+		// 이름
+		namelb = new JLabel("이름 : ");
+		namelb.setBounds(30, 140, 100, 30);
+		add(namelb);
+
+		namef = new JTextField();
+		namef.setBounds(130, 140, 120, 25);
+		add(namef);
+
+		// 나이
+		agelb = new JLabel("나이 : ");
+		agelb.setBounds(30, 180, 100, 30);
+		add(agelb);
+
+		agef = new JTextField();
+		agef.setBounds(130, 180, 120, 30);
+		add(agef);
+
+		// 성별
+		sexlb = new JLabel("성별 : ");
+		sexlb.setBounds(30, 210, 100, 30);
+		add(sexlb);
+
+		// 성별 - 라디오 버튼
 		manR = new JRadioButton("남", true);
 		womanR = new JRadioButton("여");
 		ButtonGroup genderRadio = new ButtonGroup();
-		genderRadio.add(manR);
+		genderRadio.add(manR); // 라디오그룹에 붙이기
 		genderRadio.add(womanR);
 
+		manR.setBounds(80, 210, 50, 30);
+		womanR.setBounds(130, 210, 50, 30);
+		add(manR);
+		add(womanR);
+
+		// 이메일
+		emaillb = new JLabel("이메일 : ");
+		emaillb.setBounds(30, 250, 100, 30);
+		add(emaillb);
+
+		emailf = new JTextField();
+		emailf.setBounds(130, 250, 120, 25);
+		add(emailf);
+
+		// 지역
+		loclb = new JLabel("지역 : ");
+		loclb.setBounds(30, 290, 100, 30);
+		add(loclb);
+
+		// 지역-라디오버튼
 		locModel = new DefaultComboBoxModel<Object>(locStr);
 		locC = new JComboBox<Object>(locModel);
+		locC.setBounds(130, 290, 120, 30);
+		add(locC);
 
+		// 확인, 취소 버튼
 		okB = new JButton("확인");
+		okB.setBounds(130, 330, 60, 30);
+		add(okB);
 		cancelB = new JButton("취소");
+		cancelB.setBounds(200, 330, 60, 30);
+		add(cancelB);
 
-		JPanel idP = new JPanel();
-		idP.add(idlb2);
-		idP.add(idtf2);
+		add(idP);// 붙이기
 
-		JPanel pwP = new JPanel();
-		pwP.add(pwlb2);
-		pwP.add(pwtf2);
-
-		JPanel nameP = new JPanel();
-		nameP.add(namelb);
-		nameP.add(namef);
-
-		JPanel ageP = new JPanel();
-		ageP.add(agelb);
-		ageP.add(agef);
-
-		JPanel sexP = new JPanel();
-		sexP.add(sexlb);
-		sexP.add(manR);
-		sexP.add(womanR);
-
-		JPanel emailP = new JPanel();
-		emailP.add(emaillb);
-		emailP.add(emailf);
-
-		JPanel locP = new JPanel();
-		locP.add(loclb);
-		locP.add(locC);
-
-		JPanel btnP = new JPanel();
-		btnP.add(okB);
-		btnP.add(cancelB);
-
-		JPanel top = new JPanel();
-
-		top.add(idP);
-		top.add(pwP);
-		top.add(nameP);
-		top.add(ageP);
-		top.add(sexP);
-		top.add(emailP);
-		top.add(locP);
-		top.add(btnP);
-
-		add(top);
-
+		// 버튼 리스너
 		okB.addActionListener(this);
 		cancelB.addActionListener(this);
 
-		setTitle("회원가입");
-		setSize(300, 300);
+		this.setTitle("회원가입");
+		setSize(500, 500);
 		setVisible(true);
 		setLocationRelativeTo(null);
+
 	}
 
 	@Override
@@ -183,6 +216,15 @@ class RegisterFrame extends JFrame implements ActionListener {
 			if (chkField()) {
 				JOptionPane.showMessageDialog(null, "모든 정보를 입력해 주세요.");
 				return;
+			} else if (!pwchk()) { // 비밀번호 확인
+				JOptionPane.showMessageDialog(null, "비밀번호를 확인해 주세요");
+				return;
+			} else if (!numchk()) {
+				JOptionPane.showMessageDialog(null, "나이는 숫자로 입력해주세요");
+				return;
+			} else if (chkEmail(emailf.getText())) {
+				JOptionPane.showMessageDialog(null, "이메일을 정확히 입력하세요.");
+				return;
 			} else {
 				ct.register(setMember());
 				clean();
@@ -190,6 +232,22 @@ class RegisterFrame extends JFrame implements ActionListener {
 		} else if (obj == cancelB) {
 			this.dispose();
 		}
+	}
+
+	private boolean numchk() {
+		for (int index = 0; index < agef.getText().length(); index++) {
+			if (agef.getText().charAt(index) < '0' || agef.getText().charAt(index) > '9') {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private boolean pwchk() {
+		if (String.valueOf(pwtf2.getPassword()).equals(String.valueOf(pwchktf.getPassword()))) {
+			return true;
+		}
+		return false;
 	}
 
 	private boolean chkField() {
@@ -210,6 +268,17 @@ class RegisterFrame extends JFrame implements ActionListener {
 		dto.setMemberLocation(locC.getSelectedItem().toString());
 		dto.setMemberPassword(String.valueOf(pwtf2.getPassword()));
 		return dto;
+	}
+
+	// 이메일 형식 확인
+	public boolean chkEmail(String email) {
+		String reg = "^[_a-zA-Z0-9-\\.]+@[\\.a-zA-Z0-9-]+\\.[a-zA-Z]+$";
+		email = emailf.getText();
+		Pattern p = Pattern.compile(reg);
+		Matcher m = p.matcher(email);
+		System.out.println("입력한 이메일값 : " + email);
+		System.out.println(m.matches());
+		return m.matches();
 	}
 
 	private void clean() {

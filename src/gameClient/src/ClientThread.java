@@ -5,6 +5,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
@@ -45,7 +48,6 @@ public class ClientThread extends Thread implements CommonConstant {
 
 			lg = new Login(this);
 			dto = new MemberDTO();
-
 			selfThread = this;
 
 		} catch (IOException e) {
@@ -103,21 +105,31 @@ public class ClientThread extends Thread implements CommonConstant {
 						roomList.addElement(st.nextToken());
 					}
 
-					uiWaitRoom.UserList.setListData(roomList);
+					uiWaitRoom.roomList.setListData(roomList);
 					uiWaitRoom.setVisible(true);
 
 					break;
 				}
 				case WAITUSERLIST: {
+					Vector<String> userList = new Vector<String>();
 					StringTokenizer st1 = new StringTokenizer(st.nextToken(), ",");
-
-					Vector<MemberDTO> userList = new Vector<MemberDTO>();
-
 					while (st1.hasMoreTokens()) {
-						userList.addElement(dto);
+						StringTokenizer st2 = new StringTokenizer(st1.nextToken(), ":");
+						while (st2.hasMoreTokens()) {
+							dto.setMemberId(st2.nextToken().toString());
+							dto.setMemberName(st2.nextToken());
+							dto.setMemberGender(st2.nextToken());
+							dto.setMemberAge(Integer.valueOf(st2.nextToken()));
+							dto.setMemberEmail(st2.nextToken());
+							dto.setMemberLocation(st2.nextToken());
+							Date date = new SimpleDateFormat("yyyy-MM-dd").parse(st2.nextToken());
+							dto.setMemberJoinDate(date);
+							dto.setMemberPassword(st2.nextToken());
+						}
+						userList.addElement(dto.getMemberId());
 					}
 
-					uiWaitRoom.UserList.setListData(userList);
+					uiWaitRoom.userList.setListData(userList);
 					uiWaitRoom.setVisible(true);
 
 					break;
@@ -214,7 +226,7 @@ public class ClientThread extends Thread implements CommonConstant {
 				}
 				} // switch-case
 			}
-		} catch (IOException e) {
+		} catch (IOException | ParseException e) {
 			System.err.println(e);
 			ThreadRelease();
 		}

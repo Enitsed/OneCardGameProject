@@ -32,14 +32,14 @@ public class UICreateRoom extends JFrame implements ActionListener, ItemListener
 	private JRadioButton rbUserCnt5;
 	private ButtonGroup rbUserGroup;
 
-	private JRadioButton rbUnRock;
-	private JRadioButton rbRock;
+	private JRadioButton rbUnLocked;
+	private JRadioButton rbLocked;
 	private ButtonGroup rbRockGroup;
 
 	private JButton btnOk;
 	private JButton btnCancel;
 
-	private int MaxUser, isRock;
+	private int MaxUser, isLocked;
 	private String title, password;
 
 	private ClientThread clientThread;
@@ -108,19 +108,19 @@ public class UICreateRoom extends JFrame implements ActionListener, ItemListener
 		contentPane.add(panel_1);
 		panel_1.setLayout(null);
 
-		rbUnRock = new JRadioButton("공개");
-		rbUnRock.addItemListener(this);
-		rbUnRock.setBounds(8, 6, 49, 23);
-		panel_1.add(rbUnRock);
+		rbUnLocked = new JRadioButton("공개");
+		rbUnLocked.addItemListener(this);
+		rbUnLocked.setBounds(8, 6, 49, 23);
+		panel_1.add(rbUnLocked);
 
-		rbRock = new JRadioButton("비공개");
-		rbRock.addItemListener(this);
-		rbRock.setBounds(75, 6, 61, 23);
-		panel_1.add(rbRock);
+		rbLocked = new JRadioButton("비공개");
+		rbLocked.addItemListener(this);
+		rbLocked.setBounds(75, 6, 61, 23);
+		panel_1.add(rbLocked);
 
 		rbRockGroup = new ButtonGroup();
-		rbRockGroup.add(rbRock);
-		rbRockGroup.add(rbUnRock);
+		rbRockGroup.add(rbLocked);
+		rbRockGroup.add(rbUnLocked);
 
 		JLabel lblNewLabel_1 = new JLabel("비밀번호");
 		lblNewLabel_1.setBounds(12, 208, 57, 15);
@@ -146,7 +146,7 @@ public class UICreateRoom extends JFrame implements ActionListener, ItemListener
 		Dimension dim = getToolkit().getScreenSize();
 		setLocation(dim.width / 2 - getWidth() / 2, dim.height / 2 - getHeight() / 2);
 
-		show();
+		setVisible(true);
 
 		addWindowListener(new WindowAdapter() {
 			public void windowActivated(WindowEvent e) {
@@ -169,14 +169,14 @@ public class UICreateRoom extends JFrame implements ActionListener, ItemListener
 				JOptionPane.showMessageDialog(null, "방이름을 입력하세요", "메세지", JOptionPane.ERROR_MESSAGE);
 			} else {
 				title = tftitle.getText();
-				if (isRock == 1) {
+				if (isLocked == 1) {
 					password = tfPassword.getText();
 				}
 
-				if (isRock == 1 && password.equals("")) {
+				if (isLocked == 1 && password.equals("")) {
 					JOptionPane.showMessageDialog(null, "비밀번호를 입력하세요", "메세지", JOptionPane.ERROR_MESSAGE);
 				} else {
-					clientThread.CreateRoom(title, MaxUser, isRock, password);
+					clientThread.CreateRoom(title, MaxUser, isLocked, password);
 
 					dispose();
 				}
@@ -186,13 +186,13 @@ public class UICreateRoom extends JFrame implements ActionListener, ItemListener
 	}
 
 	public void itemStateChanged(ItemEvent arg0) {
-		if (arg0.getSource() == rbUnRock) {
-			isRock = 0;
+		if (arg0.getSource() == rbUnLocked) {
+			isLocked = 0;
 			password = "0";
 			tfPassword.setText("");
 			tfPassword.setEditable(false);
-		} else if (arg0.getSource() == rbRock) {
-			isRock = 1;
+		} else if (arg0.getSource() == rbLocked) {
+			isLocked = 1;
 			tfPassword.setEditable(true);
 		} else if (arg0.getSource() == rbUserCnt2) {
 			MaxUser = 2;

@@ -21,8 +21,8 @@ import java.util.StringTokenizer;
 import java.awt.event.ActionEvent;
 
 public class UIWaitRoom extends JFrame implements ActionListener, MouseListener {
-	public JList UserList;
-	public JList roomList;
+	public JList<String> userList;
+	public JList<String> roomList;
 	public JButton btnLogout;
 	public JButton btnJoin;
 	public JButton btnCreateRoom;
@@ -52,10 +52,10 @@ public class UIWaitRoom extends JFrame implements ActionListener, MouseListener 
 		list.setBounds(105, 22, 0, 0);
 		panel.add(list);
 
-		UserList = new JList<MemberDTO>();
-		UserList.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-		UserList.setBounds(12, 21, 115, 203);
-		panel.add(UserList);
+		userList = new JList<String>();
+		userList.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		userList.setBounds(12, 21, 115, 203);
+		panel.add(userList);
 
 		btnLogout = new JButton("로그아웃");// \uB85C\uADF8\uC544\uC6C3");
 		btnLogout.addActionListener(this);
@@ -70,7 +70,7 @@ public class UIWaitRoom extends JFrame implements ActionListener, MouseListener 
 		contentPane.add(panel_1);
 		panel_1.setLayout(null);
 
-		roomList = new JList();
+		roomList = new JList<String>();
 
 		RoomListCellRenderer renderer = new RoomListCellRenderer();
 		renderer.setDefaultTab(50);
@@ -131,11 +131,10 @@ public class UIWaitRoom extends JFrame implements ActionListener, MouseListener 
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
 		if (e.getSource() == btnLogout) {
 			clientThread.logOut();
 		} else if (e.getSource() == btnCreateRoom) {
-			UICreateRoom UiCreateRoom = new UICreateRoom(clientThread);
+			new UICreateRoom(clientThread);
 		} else if (e.getSource() == btnJoin) {
 			if (!isSelected) {
 				JOptionPane.showMessageDialog(this, "방을 선택하세여", "메세지", JOptionPane.ERROR_MESSAGE);
@@ -149,11 +148,14 @@ public class UIWaitRoom extends JFrame implements ActionListener, MouseListener 
 	public void mouseClicked(MouseEvent e) {
 		isSelected = true;
 		String selectedRoomInfo = String.valueOf(((JList) e.getSource()).getSelectedValue());
-
 		StringTokenizer st = new StringTokenizer(selectedRoomInfo, ",");
-		roomNo = Integer.parseInt(st.nextToken());
+		roomNo = getSequence(roomNo);
 		roomTitle = st.nextToken();
 	}
+
+	private int getSequence(int roomNo) {
+		return roomNo++;
+	} // 방의 번호를 1씩 올려준다.
 
 	@Override
 	public void mousePressed(MouseEvent e) {
@@ -177,4 +179,5 @@ public class UIWaitRoom extends JFrame implements ActionListener, MouseListener 
 		// TODO Auto-generated method stub
 
 	}
+
 }

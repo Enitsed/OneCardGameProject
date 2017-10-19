@@ -79,7 +79,6 @@ public class MemberDAO {
 				e.printStackTrace();
 			}
 		}
-
 	} // 회원가입 메서드
 
 	public boolean login(MemberDTO dto) {
@@ -90,13 +89,9 @@ public class MemberDAO {
 		for (int i = 0; i < aList.size(); i++) {
 			if (aList.get(i).getMemberId().trim().equals(dto.getMemberId())) {
 				if (aList.get(i).getMemberPassword().equals(dto.getMemberPassword())) { // 비밀번호 확인
-					System.out.println(aList.get(i).getMemberPassword());
-					GetClientInfO(dto);
-
 					return true; // 로그인 성공
 				} else {
-					break;
-					// 로그인 실패 비밀번호 오류
+					break; // 로그인 실패 비밀번호 오류
 				}
 			}
 		} // 로그인 아이디 및 비밀번호 확인
@@ -104,7 +99,7 @@ public class MemberDAO {
 		return false;
 	} // 로그인 메서드
 
-	private MemberDTO GetClientInfO(MemberDTO dto) {
+	public MemberDTO GetClientInfo(MemberDTO dto) {
 		try {
 			conn = init();
 			String sql = "SELECT * FROM mem_info m WHERE m.id = ? AND m.password = ?";
@@ -123,7 +118,6 @@ public class MemberDAO {
 				dto.setMemberLocation(rs.getString("location"));
 				dto.setMemberJoinDate(rs.getDate("join_date"));
 			}
-
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -135,7 +129,7 @@ public class MemberDAO {
 				e.printStackTrace();
 			}
 		}
-		if(dto.getMemberId().equals(null)) {
+		if (dto.getMemberId().equals(null)) {
 			System.exit(0);
 		}
 		return dto;
@@ -165,13 +159,13 @@ public class MemberDAO {
 				MemberDTO dto = new MemberDTO();
 
 				dto.setMemberId(rs.getString("id"));
-				dto.setMemberPassword(rs.getString("password"));
 				dto.setMemberName(rs.getString("name"));
 				dto.setMemberGender(rs.getString("sex"));
 				dto.setMemberAge(rs.getInt("age"));
 				dto.setMemberEmail(rs.getString("email"));
 				dto.setMemberLocation(rs.getString("location"));
 				dto.setMemberJoinDate(rs.getDate("join_date"));
+				dto.setMemberPassword(rs.getString("password"));
 
 				aList.add(dto);
 			}

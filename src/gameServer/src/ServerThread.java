@@ -91,8 +91,8 @@ public class ServerThread extends Thread implements CommonConstant {
 
 	private synchronized void broadcast(String data, int roomNo) throws IOException {
 		ServerThread serverThread;
-		Hashtable rooms = waitingRoom.getServerThread(roomNo);
-		Enumeration enu = rooms.keys();
+		Hashtable<MemberDTO, ServerThread> rooms = waitingRoom.getServerThread(roomNo);
+		Enumeration<MemberDTO> enu = rooms.keys();
 		while (enu.hasMoreElements()) {
 			serverThread = (ServerThread) rooms.get(enu.nextElement());
 			serverThread.send(data);
@@ -100,11 +100,11 @@ public class ServerThread extends Thread implements CommonConstant {
 	}
 
 	private void SendUserList() throws IOException {
-		String ids = waitingRoom.getUserList();
+		String clients = waitingRoom.getUserList();
 		buf.setLength(0);
 		buf.append(WAITUSERLIST);
 		buf.append(SEPA);
-		buf.append(ids);
+		buf.append(clients);
 		broadcast(buf.toString(), 0);
 	}
 
@@ -139,8 +139,8 @@ public class ServerThread extends Thread implements CommonConstant {
 					loginId = st.nextToken();
 					String loginPassword = st.nextToken();
 
-					MemberDAO dao = MemberDAO.getInstance();
 					MemberDTO dto = new MemberDTO();
+
 					dto.setMemberId(loginId);
 					dto.setMemberPassword(loginPassword);
 
@@ -150,6 +150,7 @@ public class ServerThread extends Thread implements CommonConstant {
 						buf.append(LOGIN_SUCCESS);
 						buf.append(SEPA);
 						send(buf.toString());
+						dto = dao.GetClientInfo(dto);
 						waitingRoom.addUser(dto, this);
 						SendUserList();
 						SendRoomList();
@@ -174,17 +175,18 @@ public class ServerThread extends Thread implements CommonConstant {
 					dto.setMemberLocation(st.nextToken());
 					dto.setMemberPassword(st.nextToken());
 
+					buf.setLength(0);
+
 					if (dao.memberShipChk(dto)) { // 아이디가 있음.
 						buf.append(MEMBERSHIP_SUCCESS);
 					} else { // 없을때
-						System.out.println("회원 가입 요청" + buf + "데이터베이스에 등록시도");
+						System.out.println("회원 가입 요청 " + dto.getMemberId() + " 데이터베이스에 등록시도");
 						dao.insertMember(dto); // 데이타베이스에 회원 추가
 						buf.append(REGISTER_SUCCESS);
 						System.out.println("등록 성공");
 					}
 
 					send(buf.toString());
-
 					break;
 				}
 
