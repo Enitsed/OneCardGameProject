@@ -1,4 +1,3 @@
-package gameClient.src;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -36,28 +35,46 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
-import gameServer.src.MemberDTO;
-
 public class UIChattingRoom extends JFrame
-		implements ActionListener, KeyListener, ListSelectionListener, CommonConstant {
+		implements ActionListener, KeyListener, ListSelectionListener, Runnable, CommonConstant {
 
 	private JPanel contentPane;
 	private JTextField tfMsg;
 	public static JTextArea taChatting;
 	public JButton btnClose;
 	public JButton btnOut;
-	public JList<String> listMember;
+	public JList<MemberDTO> listMember;
 	private static ClientThread clientThread;
 	private boolean isSelected;
 	private String selectedId;
+	private int myTurn;
+	private int maxMember;
+
+	public int getMaxMember() {
+		return maxMember;
+	}
+
+	public void setMaxMember(int maxMember) {
+		this.maxMember = maxMember;
+	}
+
+	public int getMyTurn() {
+		return myTurn;
+	}
+
+	public void setMyTurn(int myTurn) {
+		this.myTurn = myTurn;
+	}
 
 	public String AdminID;
-	public int roomNo;
-	public String roomTitle;
+	public static int roomNo;
 
+	String userName;
 	String host;
-	static List<JButton> myCardList = new ArrayList<JButton>();
-	static List<JButton> enemyCardList = new ArrayList<JButton>();
+	static List<JButton> aList = new ArrayList<JButton>();
+	static List<JButton> enemyCardList1 = new ArrayList<JButton>();
+	static List<JButton> enemyCardList2 = new ArrayList<JButton>();
+	static List<JButton> enemyCardList3 = new ArrayList<JButton>();
 
 	// 카드 버튼
 	JButton btn1;
@@ -100,16 +117,36 @@ public class UIChattingRoom extends JFrame
 	JButton btn38;
 	JButton btn39;
 	JButton btn40;
-
 	JButton mainCard;
 
 	static JButton subCard; // 카드뽑기
+
+	DefaultTableModel tableModel;
+	JTable table;
+	JScrollPane scroll;
 
 	JPanel pan;
 	Socket socket = null;
 	Thread th;
 
+	JTextArea turn1;
+	JTextArea turn2;
+	JTextArea turn3;
+	JTextArea turn4;
+
 	public UIChattingRoom(ClientThread clientThread) {
+		turn1 = new JTextArea("turn");
+		turn1.setVisible(false);
+
+		turn2 = new JTextArea("turn");
+		turn2.setVisible(false);
+
+		turn3 = new JTextArea("turn");
+		turn3.setVisible(false);
+
+		turn4 = new JTextArea("turn");
+		turn4.setVisible(false);
+
 		setSize(new Dimension(510, 340));
 		getContentPane().setLayout(null);
 
@@ -174,6 +211,10 @@ public class UIChattingRoom extends JFrame
 		btnClose.addActionListener(this);
 		contentPane.add(btnClose);
 
+		// JPanel cardPan = new JPanel();
+		th = new Thread(this);
+		th.start();
+
 		mainCard = new JButton(new ImageIcon("gameClient/src/img/BackCard.jpg"));
 		/*
 		 * mainCard.setBorderPainted(false); mainCard.setFocusPainted(false);
@@ -190,75 +231,99 @@ public class UIChattingRoom extends JFrame
 
 		JPanel userTable1 = new JPanel(new GridLayout(1, 10)); // 플레이 하는 사용자 버튼 아래
 		userTable1.add(btn1 = new JButton());
-		myCardList.add(btn1);
+		aList.add(btn1);
 		userTable1.add(btn2 = new JButton());
-		myCardList.add(btn2);
+		aList.add(btn2);
 		userTable1.add(btn3 = new JButton());
-		myCardList.add(btn3);
+		aList.add(btn3);
 		userTable1.add(btn4 = new JButton());
-		myCardList.add(btn4);
+		aList.add(btn4);
 		userTable1.add(btn5 = new JButton());
-		myCardList.add(btn5);
+		aList.add(btn5);
 		userTable1.add(btn6 = new JButton());
-		myCardList.add(btn6);
+		aList.add(btn6);
 		userTable1.add(btn7 = new JButton());
-		myCardList.add(btn7);
+		aList.add(btn7);
 		userTable1.add(btn8 = new JButton());
-		myCardList.add(btn8);
+		aList.add(btn8);
 		userTable1.add(btn9 = new JButton());
-		myCardList.add(btn9);
+		aList.add(btn9);
 		userTable1.add(btn10 = new JButton());
-		myCardList.add(btn10);
+		aList.add(btn10);
 		userTable1.setBounds(150, 700, 800, 100);
+		turn1.setBounds(300, 600, 100, 50);
 
 		JPanel userTable2 = new JPanel(new GridLayout(1, 10)); // 2번사용자 버튼 위
 		userTable2.add(btn11 = new JButton());
-		enemyCardList.add(btn11);
+		enemyCardList1.add(btn11);
 		userTable2.add(btn12 = new JButton());
-		enemyCardList.add(btn12);
+		enemyCardList1.add(btn12);
 		userTable2.add(btn13 = new JButton());
-		enemyCardList.add(btn13);
+		enemyCardList1.add(btn13);
 		userTable2.add(btn14 = new JButton());
-		enemyCardList.add(btn14);
+		enemyCardList1.add(btn14);
 		userTable2.add(btn15 = new JButton());
-		enemyCardList.add(btn15);
+		enemyCardList1.add(btn15);
 		userTable2.add(btn16 = new JButton());
-		enemyCardList.add(btn16);
+		enemyCardList1.add(btn16);
 		userTable2.add(btn17 = new JButton());
-		enemyCardList.add(btn17);
+		enemyCardList1.add(btn17);
 		userTable2.add(btn18 = new JButton());
-		enemyCardList.add(btn18);
+		enemyCardList1.add(btn18);
 		userTable2.add(btn19 = new JButton());
-		enemyCardList.add(btn19);
+		enemyCardList1.add(btn19);
 		userTable2.add(btn20 = new JButton());
-		enemyCardList.add(btn20);
+		enemyCardList1.add(btn20);
 		userTable2.setBounds(150, 10, 800, 100);
+		turn2.setBounds(810, 250, 100, 50);
 
 		JPanel userTable3 = new JPanel(new GridLayout(10, 1)); // 3번 사용자 버튼 왼쪽
 		userTable3.add(btn21 = new JButton());
+		enemyCardList2.add(btn21);
 		userTable3.add(btn22 = new JButton());
+		enemyCardList2.add(btn22);
 		userTable3.add(btn23 = new JButton());
+		enemyCardList2.add(btn23);
 		userTable3.add(btn24 = new JButton());
+		enemyCardList2.add(btn24);
 		userTable3.add(btn25 = new JButton());
+		enemyCardList2.add(btn25);
 		userTable3.add(btn26 = new JButton());
+		enemyCardList2.add(btn26);
 		userTable3.add(btn27 = new JButton());
+		enemyCardList2.add(btn27);
 		userTable3.add(btn28 = new JButton());
+		enemyCardList2.add(btn28);
 		userTable3.add(btn29 = new JButton());
+		enemyCardList2.add(btn29);
 		userTable3.add(btn30 = new JButton());
+		enemyCardList2.add(btn30);
 		userTable3.setBounds(10, 100, 100, 600);
+		turn3.setBounds(300, 300, 100, 50);
 
 		JPanel userTable4 = new JPanel(new GridLayout(10, 1)); // 4번 사용자 버튼 오른쪽
 		userTable4.add(btn31 = new JButton());
+		enemyCardList3.add(btn31);
 		userTable4.add(btn32 = new JButton());
+		enemyCardList3.add(btn32);
 		userTable4.add(btn33 = new JButton());
+		enemyCardList3.add(btn33);
 		userTable4.add(btn34 = new JButton());
+		enemyCardList3.add(btn34);
 		userTable4.add(btn35 = new JButton());
+		enemyCardList3.add(btn35);
 		userTable4.add(btn36 = new JButton());
+		enemyCardList3.add(btn36);
 		userTable4.add(btn37 = new JButton());
+		enemyCardList3.add(btn37);
 		userTable4.add(btn38 = new JButton());
+		enemyCardList3.add(btn38);
 		userTable4.add(btn39 = new JButton());
+		enemyCardList3.add(btn39);
 		userTable4.add(btn40 = new JButton());
+		enemyCardList3.add(btn40);
 		userTable4.setBounds(990, 100, 100, 600);
+		turn4.setBounds(800, 600, 100, 50);
 
 		JPanel jp = new JPanel();// 게임판 전채 판
 		jp.add(userTable1);
@@ -268,30 +333,39 @@ public class UIChattingRoom extends JFrame
 		jp.add(mainCard);
 		jp.add(subCard);
 		jp.setLayout(null);
-
+		add(turn1);
+		add(turn2);
+		add(turn3);
+		add(turn4);
 		// 게임판 크기
 		jp.setBounds(10, 10, 1500, 900);
 		add(jp);
 
-		for (int i = 0; i < myCardList.size(); i++) {
-			myCardList.get(i).addActionListener(this);
-			myCardList.get(i).setBorderPainted(false);
-			myCardList.get(i).setFocusPainted(false);
-			myCardList.get(i).setContentAreaFilled(false);
+		// 버튼 이미지 가리기
+		for (int i = 0; i < aList.size(); i++) {
+			aList.get(i).addActionListener(this);
+			aList.get(i).setBorderPainted(false);
+			aList.get(i).setFocusPainted(false);
+			aList.get(i).setContentAreaFilled(false);
 		}
 
-		for (int i = 0; i < enemyCardList.size(); i++) {
-			enemyCardList.get(i).setBorderPainted(false);
-			enemyCardList.get(i).setFocusPainted(false);
-			enemyCardList.get(i).setContentAreaFilled(false);
+		for (int i = 0; i < enemyCardList1.size(); i++) {
+			enemyCardList1.get(i).setBorderPainted(false);
+			enemyCardList1.get(i).setFocusPainted(false);
+			enemyCardList1.get(i).setContentAreaFilled(false);
 		}
-		// 버튼 이미지 가리기
-		/*
-		 * for (int i = 0; i < aList.size(); i++) {
-		 * aList.get(i).addActionListener(this); aList.get(i).setBorderPainted(false);
-		 * aList.get(i).setFocusPainted(false);
-		 * aList.get(i).setContentAreaFilled(false); }
-		 */
+
+		for (int i = 0; i < enemyCardList2.size(); i++) {
+			enemyCardList2.get(i).setBorderPainted(false);
+			enemyCardList2.get(i).setFocusPainted(false);
+			enemyCardList2.get(i).setContentAreaFilled(false);
+		}
+
+		for (int i = 0; i < enemyCardList3.size(); i++) {
+			enemyCardList3.get(i).setBorderPainted(false);
+			enemyCardList3.get(i).setFocusPainted(false);
+			enemyCardList3.get(i).setContentAreaFilled(false);
+		}
 		mainCard.addActionListener(this);
 
 		setSize(1600, 900);
@@ -313,12 +387,12 @@ public class UIChattingRoom extends JFrame
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
 		if (e.getSource() == btnOut) {
 			if (!isSelected) {
 				JOptionPane.showMessageDialog(this, "Id를 클릭해주세요", "메세지", JOptionPane.ERROR_MESSAGE);
 			} else {
-				if (AdminID.equals(clientThread.getDto().getMemberId())
-						&& selectedId != clientThread.getDto().getMemberId()) {
+				if (AdminID.equals(clientThread.getUserID()) && selectedId != clientThread.getUserID()) {
 					System.out.println(selectedId);
 
 					clientThread.sendFire(selectedId);
@@ -328,11 +402,12 @@ public class UIChattingRoom extends JFrame
 				isSelected = false;
 			}
 		} else if (e.getSource() == btnClose) {
-			clientThread.closeChatRoom();
+			clientThread.send(CLOSECHATROOM + SEPA + clientThread.dto.getMemberId());
+			this.dispose();
 		}
 
-		for (int i = 0; i < myCardList.size(); i++) {
-			if (e.getSource() == myCardList.get(i)) {
+		for (int i = 0; i < aList.size(); i++) {
+			if (e.getSource() == aList.get(i)) {
 				System.out.println(i);
 				clientThread.send("" + SELECTCARD + SEPA + i);
 				break;
@@ -367,6 +442,7 @@ public class UIChattingRoom extends JFrame
 
 	@Override
 	public void keyReleased(KeyEvent e) {
+		// TODO Auto-generated method stub
 
 	}
 
@@ -374,36 +450,158 @@ public class UIChattingRoom extends JFrame
 		tfMsg.setText("");
 	}
 
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+
+	}
+
 	public static void buttonSetting(String[] str) {
-		for (int i = 0; i < myCardList.size(); i++) {
+		for (int i = 0; i < aList.size(); i++) {
 			if (str.length - 1 < i) {
-				myCardList.get(i).setIcon(new ImageIcon(""));
+				aList.get(i).setIcon(new ImageIcon(""));
 			} else {
 				String str2 = "src/img/" + str[i] + ".jpg";
 				System.out.println(str2);
 
-				myCardList.get(i).setIcon(new ImageIcon(str2));
+				aList.get(i).setIcon(new ImageIcon(str2));
 
 			}
 		}
 	}
 
-	public static int shapeChoice() {
+	public void EnemyCard(int inf, int enemyTurn) {
+		if (maxMember == 2) {
+			for (int i = 0; i < enemyCardList1.size(); i++) {
+				if (i < inf) {
+					String str2 = "src/img/BackCard.jpg";
+					enemyCardList1.get(i).setIcon(new ImageIcon(str2));
+				} else {
+					enemyCardList1.get(i).setIcon(new ImageIcon(""));
+				}
+			}
+		} else if (maxMember == 3) {
+			if ((myTurn + 1 <= 2 ? myTurn + 1 : myTurn + 1 - 3) == enemyTurn) {
+				for (int i = 0; i < enemyCardList3.size(); i++) {
+					if (i < inf) {
+						String str2 = "src/img/BackCardRotation.jpg";
+						enemyCardList3.get(i).setIcon(new ImageIcon(str2));
+					} else {
+						enemyCardList3.get(i).setIcon(new ImageIcon(""));
+					}
+				}
+			} else if ((myTurn + 2 <= 2 ? myTurn + 2 : myTurn + 2 - 3) == enemyTurn) {
+				for (int i = 0; i < enemyCardList1.size(); i++) {
+					if (i < inf) {
+						String str2 = "src/img/BackCard.jpg";
+						enemyCardList1.get(i).setIcon(new ImageIcon(str2));
+					} else {
+						enemyCardList1.get(i).setIcon(new ImageIcon(""));
+					}
+				}
+			}
+		} else if (maxMember == 4) {
+			System.out.println("enemyTurn : " + enemyTurn);
+			if ((myTurn + 1 <= 3 ? myTurn + 1 : myTurn + 1 - 4) == enemyTurn) {
+				for (int i = 0; i < enemyCardList3.size(); i++) {
+					if (i < inf) {
+						String str2 = "src/img/BackCardRotation.jpg";
+						enemyCardList3.get(i).setIcon(new ImageIcon(str2));
+					} else {
+						enemyCardList3.get(i).setIcon(new ImageIcon(""));
+					}
+				}
+			} else if ((myTurn + 2 <= 3 ? myTurn + 2 : myTurn + 2 - 4) == enemyTurn) {
+				for (int i = 0; i < enemyCardList1.size(); i++) {
+					if (i < inf) {
+						String str2 = "src/img/BackCard.jpg";
+						enemyCardList1.get(i).setIcon(new ImageIcon(str2));
+					} else {
+						enemyCardList1.get(i).setIcon(new ImageIcon(""));
+					}
+				}
+			} else if ((myTurn + 3 <= 3 ? myTurn + 3 : myTurn + 3 - 4) == enemyTurn) {
+				for (int i = 0; i < enemyCardList2.size(); i++) {
+					if (i < inf) {
+						String str2 = "src/img/BackCardRotation.jpg";
+						enemyCardList2.get(i).setIcon(new ImageIcon(str2));
+					} else {
+						enemyCardList2.get(i).setIcon(new ImageIcon(""));
+					}
+				}
+			}
+		}
+
+	}
+
+	public static void shapeChoice() {
 		String[] buttons = { "하트", "클로버", "스페이드", "다이아" };
 		int selectShape = JOptionPane.showOptionDialog(null, "원하는 모양을 선택하세요.", "모양 선택",
 				JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, buttons, "두번째값");
 		System.out.println(selectShape);
-		clientThread.send("" + SELECT_SHAPE + SEPA + selectShape);
-		return selectShape;
+		String str = "";
+		if (selectShape == 0) {
+			str = "하트";
+		} else if (selectShape == 1) {
+			str = "클로버";
+		} else if (selectShape == 2) {
+			str = "스페이드";
+		} else if (selectShape == 3) {
+			str = "다이아";
+		}
+		clientThread.send(SELECT_SHAPE + SEPA + str);
+		clientThread.send(SENDWORD + SEPA + roomNo + SEPA + str + "모양을 선택했습니다!!!!");
 	}
 
-	public void enemyCard(int num, int inf) {
-		for (int i = 0; i < enemyCardList.size(); i++) {
-			if (i < inf) {
-				String str2 = "src/img/BackCard.jpg";
-				enemyCardList.get(i).setIcon(new ImageIcon(str2));
+	public void nowTurn(int turn) {
+		if (maxMember == 2) {
+			if (turn == myTurn) {
+				turn1.setVisible(true);
+				turn2.setVisible(false);
+				turn3.setVisible(false);
+				turn4.setVisible(false);
 			} else {
-				enemyCardList.get(i).setIcon(new ImageIcon(""));
+				turn1.setVisible(false);
+				turn2.setVisible(true);
+				turn3.setVisible(false);
+				turn4.setVisible(false);
+			}
+		} else if (maxMember == 3) {
+			if ((myTurn + 1 <= 2 ? myTurn + 1 : myTurn + 1 - 3) == turn) {
+				turn2.setVisible(false);
+				turn1.setVisible(false);
+				turn4.setVisible(true);
+
+			} else if ((myTurn + 2 <= 2 ? myTurn + 2 : myTurn + 2 - 3) == turn) {
+				turn2.setVisible(true);
+				turn1.setVisible(false);
+				turn4.setVisible(false);
+			} else {
+				turn2.setVisible(false);
+				turn1.setVisible(true);
+				turn4.setVisible(false);
+			}
+		} else if (maxMember == 4) {
+			if ((myTurn + 1 <= 3 ? myTurn + 1 : myTurn + 1 - 4) == turn) {
+				turn1.setVisible(false);
+				turn2.setVisible(false);
+				turn3.setVisible(false);
+				turn4.setVisible(true);
+			} else if ((myTurn + 2 <= 3 ? myTurn + 2 : myTurn + 2 - 4) == turn) {
+				turn1.setVisible(false);
+				turn2.setVisible(true);
+				turn3.setVisible(false);
+				turn4.setVisible(false);
+			} else if ((myTurn + 3 <= 3 ? myTurn + 3 : myTurn + 3 - 4) == turn) {
+				turn1.setVisible(false);
+				turn2.setVisible(false);
+				turn3.setVisible(true);
+				turn4.setVisible(false);
+			} else {
+				turn1.setVisible(true);
+				turn2.setVisible(false);
+				turn3.setVisible(false);
+				turn4.setVisible(false);
 			}
 		}
 	}

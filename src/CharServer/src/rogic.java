@@ -1,10 +1,19 @@
-package gameServer.src;
-
+import java.awt.BorderLayout;
+import java.awt.Button;
+import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Random;
 
-class GameLogic implements Runnable, CommonConstant {
-	ArrayList<ServerThread> pl = new ArrayList<>();
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.border.Border;
+
+class rogic implements Runnable, CommonConstant {
+	ArrayList<serverThread> pl = new ArrayList<>();
 	ArrayList<Card> mainCardDeck;
 	ArrayList<Card> subCardDeck;
 
@@ -14,10 +23,11 @@ class GameLogic implements Runnable, CommonConstant {
 	String nowNum;
 	public boolean gameStart;
 	public boolean endGame;
-
+	int maxUser;
 	Thread th;
 
-	public GameLogic() {
+	public rogic(int maxUser) {
+		this.maxUser = maxUser;
 		nowShape = null;
 		gameStart = false;
 		endGame = true;
@@ -28,26 +38,7 @@ class GameLogic implements Runnable, CommonConstant {
 		Thread th = new Thread(this);
 		th.start();
 	}
-
-	public void shuffleCard() {
-		Random rd = new Random();
-		for (int i = 0; i < 1000; i++) {
-			int num1 = rd.nextInt(mainCardDeck.size());
-			int num2 = rd.nextInt(mainCardDeck.size());
-
-			Card ra = mainCardDeck.get(num1);
-			mainCardDeck.set(num1, mainCardDeck.get(num2));
-			mainCardDeck.set(num2, ra);
-		}
-	}
-
-	public void subMoveMain() {
-		for (int i = 1; i < subCardDeck.size() - 1; i++) {
-			mainCardDeck.add(subCardDeck.get(i));
-			subCardDeck.remove(i);
-		}
-	}
-
+	
 	public void cardDecADD() {
 		Card cd1 = new Card();
 		cd1.setNum("2");
@@ -363,17 +354,40 @@ class GameLogic implements Runnable, CommonConstant {
 		mainCardDeck.add(cd52);
 	}
 
+	public void shuffleCard() {
+
+		Random rd = new Random();
+		for (int i = 0; i < 1000; i++) {
+			int num1 = rd.nextInt(mainCardDeck.size());
+			int num2 = rd.nextInt(mainCardDeck.size());
+
+			Card ra = mainCardDeck.get(num1);
+			mainCardDeck.set(num1, mainCardDeck.get(num2));
+			mainCardDeck.set(num2, ra);
+		}
+	}
+
+	public void subMoveMain() {
+
+		for (int i = 1; i < subCardDeck.size() - 1; i++) {
+			mainCardDeck.add(subCardDeck.get(i));
+			subCardDeck.remove(i);
+		}
+	}
+
+	
 	public void gameStart() {
 		cardDecADD();
 		shuffleCard();
 		turn = 0;
-
 		for (int i = 0; i < pl.size(); i++) {
 			pl.get(i).getMyCard().clear();
 			for (int j = 0; j < 5; j++) {
 				pl.get(i).setMyCard(mainCardDeck.get(0));
 				mainCardDeck.remove(0);
 			}
+			String str = MY_TURN_NUM + SEPA + i;
+			pl.get(i).send(str);
 		}
 
 		subCardDeck.add(mainCardDeck.get(0));
@@ -387,68 +401,98 @@ class GameLogic implements Runnable, CommonConstant {
 	}
 
 	public void endCheck() {
-		if (pl.get(turn).getMyCard().size() == 0 || pl.get(turn).getMyCard().size() > 10) {
+		if(pl.get(turn).getMyCard().size() <= 0) {
 			endGame();
+		}else {
+			if (pl.get(turn).getMyCard().size() > 10) {
+				pl.get(turn).gameLose = true;
+				int num = pl.get(turn).getMyCard().size();
+				for (int i = 0; i < num; i++) {
+					mainCardDeck.add(pl.get(turn).getMyCard().get(0));
+					pl.get(turn).getMyCard().remove(0);
+				}
+				System.out.println(pl.get(turn).getMyCard().size());
+				shuffleCard();	
+			}
+			
+			
+			int count = 0 ;
+			for(int i = 0 ; i < pl.size() ; i ++) {
+				if(pl.get(i).gameLose == true) {
+					count++;
+				}
+			}
+			
+			System.out.println("count : " +count);
+			if(count == maxUser || count == maxUser - 1) {
+				endGame();
+			}else {
+				endTurn();
+			}
 		}
 	}
 
 	public void endTurn() {
+
 		pl.get(turn).setMyTurn(false);
 		nextTurn();
 		pl.get(turn).setMyTurn(true);
 	}
 
 	public void nextTurn() {
+		System.out.println("7");
+
 		turn++;
 		if (turn >= total) {
 			turn = 0;
 		}
+
+		if (pl.get(turn).gameLose == true) {
+			nextTurn();
+		}
 	}
 
 	synchronized public void cardCheck(String str) {
+
 		int num = Integer.parseInt(str);
 
-		try {
-			if (num == 10) {
-				System.out.println("1. shape : " + nowShape);
-				System.out.println("1. num : " + nowNum);
+		if (num == 10) {
+			System.out.println("1. shape : " + nowShape);
+			System.out.println("1. num : " + nowNum);
 
-				pl.get(turn).getMyCard().add(mainCardDeck.get(0));
-				mainCardDeck.remove(0);
+			pl.get(turn).getMyCard().add(mainCardDeck.get(0));
+			mainCardDeck.remove(0);
 
-				System.out.println("2. shape : " + nowShape);
-				System.out.println("2. num : " + nowNum);
+			System.out.println("2. shape : " + nowShape);
+			System.out.println("2. num : " + nowNum);
 
-				endCheck();
-				endTurn();
-			} else if (nowShape.equals(pl.get(turn).getMyCard().get(num).getShape())
-					|| nowNum.equals(pl.get(turn).getMyCard().get(num).getNum())) {
-				System.out.println("1. shape : " + nowShape);
-				System.out.println("1. num : " + nowNum);
+			endCheck();
+		} else if (nowShape.equals(pl.get(turn).getMyCard().get(num).getShape())
+				|| nowNum.equals(pl.get(turn).getMyCard().get(num).getNum())) {
+			System.out.println("1. shape : " + nowShape);
+			System.out.println("1. num : " + nowNum);
 
-				nowShape = pl.get(turn).getMyCard().get(num).getShape();
-				nowNum = pl.get(turn).getMyCard().get(num).getNum();
+			nowShape = pl.get(turn).getMyCard().get(num).getShape();
+			nowNum = pl.get(turn).getMyCard().get(num).getNum();
 
-				subCardDeck.add(0, pl.get(turn).getMyCard().get(num));
-				pl.get(turn).getMyCard().remove(num);
+			subCardDeck.add(0, pl.get(turn).getMyCard().get(num));
+			pl.get(turn).getMyCard().remove(num);
 
-				attackCheck(subCardDeck.get(0));
+			attackCheck(subCardDeck.get(0));
 
-				System.out.println("2. shape : " + nowShape);
-				System.out.println("2. num : " + nowNum);
-			}
-
-			broadcast();
-
-		} catch (IndexOutOfBoundsException e) {
-			System.out.println("카드체크 메서드 오류");
+			System.out.println("2. shape : " + nowShape);
+			System.out.println("2. num : " + nowNum);
 		}
+
+		broadcast();
+
 	}
 
 	public void endGame() {
 		System.out.println("end Game");
 		for (int i = 0; i < pl.size(); i++) {
 			pl.get(i).setMyTurn(false);
+			pl.get(i).gameLose = false;
 		}
 		reset();
 		gameStart = false;
@@ -457,19 +501,26 @@ class GameLogic implements Runnable, CommonConstant {
 	public void attackCheck(Card cd) {
 		if (cd.getNum().equals("A")) {
 			attackCard(2);
+			endCheck();
 		} else if (cd.getNum().equals("2")) {
 			attackCard(3);
+
+			endCheck();
 		} else if (cd.getNum().equals("J")) {
+			endCheck();
+
 			endCheck();
 			return;
 		} else if (cd.getNum().equals("7")) {
+			String str = pl.get(turn).selectShape();
+			nowShape = str;
+			endCheck();
 
 		} else if (cd.getNum().equals("K")) {
-			endCheck();
 			return;
+		}else {
+			endCheck();
 		}
-		endCheck();
-		endTurn();
 	}
 
 	public void attackCard(int add) {
@@ -498,9 +549,11 @@ class GameLogic implements Runnable, CommonConstant {
 		for (int j = 0; j < pl.size(); j++) {
 			for (int i = 0; i < pl.size(); i++) {
 				if (!pl.get(j).equals(pl.get(i))) {
-					str3 += i + SEPA;
-					str3 += pl.get(i).getMyCard().size();
+					str3 += pl.get(i).getMyCard().size() + SEPA;
+					str3 += i;
 					pl.get(j).send(str3);
+					System.out.println("str3 : " + str3);
+
 					str3 = ENEMYCARD_INFORMATION + SEPA;
 				}
 			}
@@ -516,7 +569,11 @@ class GameLogic implements Runnable, CommonConstant {
 
 			pl.get(i).send(str);
 			pl.get(i).send(str2);
+			System.out.println("turn : " + turn);
+			pl.get(i).send(NOW_TURN + SEPA + turn);
 		}
+		
+		
 	}
 
 	public void run() {
@@ -524,13 +581,14 @@ class GameLogic implements Runnable, CommonConstant {
 			try {
 				th.sleep(100);
 			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			if (gameStart == true) {
-				if (pl.size() < 2) {
+				if (pl.size() < maxUser) {
 					endGame();
 				}
-			} else if (gameStart == false && pl.size() == 2) {
+			} else if (gameStart == false && pl.size() >= maxUser) {
 				// System.out.println(pl.size());
 				System.out.println("gameStart");
 				total = pl.size();

@@ -7,7 +7,7 @@ grant all on hr.mem_info to hr;
 CREATE TABLE mem_info(
    id varchar2(20) primary key,
    password varchar2(20) not null,
-   name varchar2(20) constraint name_uk unique,
+   name varchar2(20),
    sex varchar2(4) not null,
    age number(3) not null,
    email varchar2(20),
@@ -19,8 +19,11 @@ CREATE TABLE mem_info(
 
 INSERT INTO mem_info (id, name, sex, age, email, location, join_date, password)
 VALUES ('khacademy', '정우', '남', 26, 'jeongwo@naver.com', '수원', sysdate, 'khacademy');
+drop table mem_info
+SELECT * FROM mem_info;
+SELECT * FROM win_lose;
 
-select * from mem_info
+delete from mem_info where id='bbbbbb';
 
 CREATE TABLE game_room(
    gaming_room number(3) constraint gaming_room_pk primary key,
@@ -44,15 +47,25 @@ add constraint money_id_fk foreign key(id) references mem_info(id);
 -- 회원 보유금액 mem_money
 
 CREATE TABLE win_lose(
-   id varchar2(20),
-   ranking number(20) constraint ranking_pk primary key,
+   id varchar2(20) not null,
+   ranking number(20) primary key,
    win_rate number(3) not null,
    win_count number(5) not null,
    lose_count number(5) not null
 );
 
+alter table grade_info
+drop constraint rank_score_fk
+
+select * from win_lose
+
 alter table win_lose
-add constraint winlose_id_fk foreign key(id) references mem_info(id);
+drop constraint ranking_pk;
+
+drop table win_lose
+
+alter table win_lose
+drop constraint winlose_id_fk foreign key(id) references mem_info(id);
 
 -- 회원 승패 win_lose
 

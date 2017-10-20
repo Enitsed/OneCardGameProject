@@ -1,4 +1,3 @@
-package gameClient.src;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,16 +16,13 @@ import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
-import gameServer.src.MemberDTO;
-
 class Login extends JFrame implements ActionListener {
 	JTextField idtf;
 	JPasswordField pwtf;
 	JButton logB, regB;
 	JLabel idlb, pwlb;
 	ClientThread ct;
-	RegisterFrame registerFrame;
-
+	 RegisterFrame registerFrame;
 	public Login(ClientThread ct) {
 		this.ct = ct;
 		idlb = new JLabel("ID : ");
@@ -71,9 +67,7 @@ class Login extends JFrame implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		Object obj = e.getSource();
 		if (obj == logB) {
-			String id = idtf.getText();
-			String password = String.valueOf(pwtf.getPassword());
-			ct.login(id, password);
+			ct.login(idtf.getText(), pwtf.getText());
 		} else if (obj == regB) {
 			registerFrame = new RegisterFrame(ct);
 		}
@@ -81,7 +75,7 @@ class Login extends JFrame implements ActionListener {
 	}
 }
 
-class RegisterFrame extends JFrame implements ActionListener {
+class RegisterFrame extends JFrame implements ActionListener, CommonConstant {
 	JTextField idtf2, namef, agef, emailf;
 	JPasswordField pwtf2, pwchktf;
 	JLabel idlb2, pwlb2, namelb, agelb, emaillb, sexlb, loclb, pwchklb;
@@ -199,17 +193,25 @@ class RegisterFrame extends JFrame implements ActionListener {
 		// 버튼 리스너
 		okB.addActionListener(this);
 		cancelB.addActionListener(this);
+		chkB.addActionListener(this);
 
 		this.setTitle("회원가입");
 		setSize(500, 500);
 		setVisible(true);
 		setLocationRelativeTo(null);
-
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object obj = e.getSource();
+		String email = emailf.getText();
+		String id = idtf2.getText();
+		String pw = pwtf2.getText();
+
+		if (obj == chkB) {// 중복확인버튼
+			ct.send(IDCHECK + SEPA + idtf2.getText());
+			return;
+		}
 
 		if (obj == okB) {
 			// 회원가입 메소드
@@ -219,19 +221,49 @@ class RegisterFrame extends JFrame implements ActionListener {
 			} else if (!pwchk()) { // 비밀번호 확인
 				JOptionPane.showMessageDialog(null, "비밀번호를 확인해 주세요");
 				return;
-			} else if (!numchk()) {
+			} else if (chkID_Length(id)) { // 아이디 길이체크
+				JOptionPane.showMessageDialog(null, "아이디는 6자리이상 10자리 이하로 입력하세요.");
+				return;
+			} else if (chkPW_Length(pw)) { // 비밀번호 길이체크
+				JOptionPane.showMessageDialog(null, "비밀번호는 6자리이상 10자리 이하로 입력하세요.");
+				return;
+			} else if (chkEmail(email) == false) { // 이메일 형식체크
+				JOptionPane.showMessageDialog(null, "이메일 형식을 확인하세요.");
+				return;
+			} else if (!numchk()) {// 나이 숫자체크
 				JOptionPane.showMessageDialog(null, "나이는 숫자로 입력해주세요");
 				return;
-			} else if (chkEmail(emailf.getText())) {
-				JOptionPane.showMessageDialog(null, "이메일을 정확히 입력하세요.");
-				return;
 			} else {
-				ct.register(setMember());
+				String str;
+				if (manR.isSelected()) {
+					str = "남";
+				} else
+					str = "여";
+				ct.register(idtf2.getText(), namef.getText(), str, agef.getText(), emailf.getText(),
+						locC.getSelectedItem().toString(), pwtf2.getPassword());
 				clean();
 			}
 		} else if (obj == cancelB) {
 			this.dispose();
 		}
+
+	}
+
+	public boolean chkID_Length(String id) {
+		id = idtf2.getText();
+		if (id.length() < 6 || id.length() > 10) {
+			return true;
+		}
+		return false;
+	}
+
+	// 비밀번호 길이체크
+	public boolean chkPW_Length(String pw) {
+		pw = pwtf2.getText();
+		if (pw.length() < 6 || pw.length() > 10) {
+			return true;
+		}
+		return false;
 	}
 
 	private boolean numchk() {
@@ -240,37 +272,10 @@ class RegisterFrame extends JFrame implements ActionListener {
 				return false;
 			}
 		}
+
 		return true;
 	}
 
-	private boolean pwchk() {
-		if (String.valueOf(pwtf2.getPassword()).equals(String.valueOf(pwchktf.getPassword()))) {
-			return true;
-		}
-		return false;
-	}
-
-	private boolean chkField() {
-		if (idtf2.getText().isEmpty() || namef.getText().isEmpty() || agef.getText().isEmpty()
-				|| emailf.getText().isEmpty() || pwtf2.getPassword().length == 0) {
-			return true;
-		}
-		return false;
-	}
-
-	private MemberDTO setMember() {
-		MemberDTO dto = new MemberDTO();
-		dto.setMemberId(idtf2.getText());
-		dto.setMemberName(namef.getText());
-		dto.setMemberGender(manR.isSelected() ? "남" : "여");
-		dto.setMemberAge(Integer.valueOf(agef.getText()));
-		dto.setMemberEmail(emailf.getText());
-		dto.setMemberLocation(locC.getSelectedItem().toString());
-		dto.setMemberPassword(String.valueOf(pwtf2.getPassword()));
-		return dto;
-	}
-
-	// 이메일 형식 확인
 	public boolean chkEmail(String email) {
 		String reg = "^[_a-zA-Z0-9-\\.]+@[\\.a-zA-Z0-9-]+\\.[a-zA-Z]+$";
 		email = emailf.getText();
@@ -279,6 +284,24 @@ class RegisterFrame extends JFrame implements ActionListener {
 		System.out.println("입력한 이메일값 : " + email);
 		System.out.println(m.matches());
 		return m.matches();
+	}
+
+	private boolean pwchk() {
+
+		if (String.valueOf(pwtf2.getPassword()).equals(String.valueOf(pwchktf.getPassword()))) {
+			return true;
+		}
+
+		return false;
+
+	}
+
+	private boolean chkField() {
+		if (idtf2.getText().isEmpty() || namef.getText().isEmpty() || agef.getText().isEmpty()
+				|| emailf.getText().isEmpty() || pwtf2.getPassword().length == 0) {
+			return true;
+		}
+		return false;
 	}
 
 	private void clean() {
@@ -290,5 +313,8 @@ class RegisterFrame extends JFrame implements ActionListener {
 		manR.setSelected(true);
 		locC.setSelectedIndex(0);
 		idtf2.requestFocus();
+		pwchktf.setText("");
+
 	} // 입력창 비우기
+
 }

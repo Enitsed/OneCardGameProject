@@ -1,4 +1,3 @@
-package gameClient.src;
 
 import java.awt.Component;
 import java.awt.FontMetrics;
@@ -35,7 +34,7 @@ public class RoomListCellRenderer extends JLabel implements ListCellRenderer{
 		
 		setText(value.toString());
 		setBackground(isSelected ? list.getSelectionBackground() : list.getBackground());
-		setForeground(isSelected ? list.getSelectionBackground() : list.getBackground());
+		setForeground(isSelected ? list.getSelectionBackground() : list.getForeground());
 		
 		setFont(list.getFont());
 		setBorder((cellHasFocus) ? UIManager.getBorder("List.focusCellHighlightBorder") : m_noFocusBorder);
