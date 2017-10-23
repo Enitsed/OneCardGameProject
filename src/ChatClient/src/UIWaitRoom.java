@@ -1,5 +1,5 @@
-
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -9,8 +9,11 @@ import javax.swing.border.TitledBorder;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.border.BevelBorder;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import java.awt.Font;
+import java.awt.Graphics;
+
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import java.awt.event.ActionListener;
@@ -32,17 +35,25 @@ public class UIWaitRoom extends JFrame implements ActionListener, MouseListener 
 	private String roomTitle;
 	public ClientThread clientThread;
 
+	ImageIcon icon;
 	public UIWaitRoom(ClientThread clientThread) {
 		this.clientThread = clientThread;
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 539, 370);
-		contentPane = new JPanel();
+		icon = new ImageIcon("src/img/waitBack.jpg");
+		contentPane = new JPanel(){
+			public void paintComponent(Graphics g) {
+				g.drawImage(icon.getImage(), 0, 0, 537, 370, null);
+				setOpaque(false);
+				super.paintComponent(g);
+			}
+		};
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
 		JPanel panel = new JPanel();
-		panel.setBorder(new TitledBorder(null, "\uD604\uC7AC \uC811\uC18D\uB41C \uC0AC\uC6A9\uC790", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel.setBorder(new TitledBorder(null, "현재 접속된 사용자", TitledBorder.LEADING, TitledBorder.TOP, null, Color.YELLOW));
 		panel.setBounds(352, 10, 139, 234);
 		contentPane.add(panel);
 		panel.setLayout(null);
@@ -54,17 +65,20 @@ public class UIWaitRoom extends JFrame implements ActionListener, MouseListener 
 		UserList = new JList();
 		UserList.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		UserList.setBounds(12, 21, 115, 203);
+		panel.setBackground(new Color(255,0,0,0));
 		panel.add(UserList);
 		
-		btnLogout = new JButton("로그아웃");
+		btnLogout = new JButton(new ImageIcon("src/buttonImg/logout.png"));
 		btnLogout.addActionListener(this);
-		btnLogout.setFont(new Font("돋움", Font.BOLD, 14));
 		btnLogout.setBounds(362, 254, 129, 36);
+		btnLogout.setBorderPainted(false);
+		btnLogout.setContentAreaFilled(false);
 		contentPane.add(btnLogout);
 		
 		JPanel panel_1 = new JPanel();
-		panel_1.setBorder(new TitledBorder(null, "\uB300\uD654\uBC29 \uBAA9\uB85D", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel_1.setBorder(new TitledBorder(null, "대화방 목록", TitledBorder.LEADING, TitledBorder.TOP, null, Color.yellow));
 		panel_1.setBounds(12, 10, 328, 240);
+		panel_1.setBackground(new Color(255,0,0,0));
 		contentPane.add(panel_1);
 		panel_1.setLayout(null);
 		
@@ -80,46 +94,58 @@ public class UIWaitRoom extends JFrame implements ActionListener, MouseListener 
 		roomList.setBounds(12, 49, 293, 186);
 		panel_1.add(roomList);
 		
-		JLabel lblNewLabel = new JLabel("\uBC88\uD638");
+		JLabel lblNewLabel = new JLabel("번호");
 		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		lblNewLabel.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		lblNewLabel.setBounds(12, 21, 48, 19);
+		lblNewLabel.setBackground(new Color(255,0,0,0));
+		lblNewLabel.setForeground(Color.YELLOW);
 		panel_1.add(lblNewLabel);
 		
-		JLabel label = new JLabel("\uBC29 \uC81C\uBAA9");
+		JLabel label = new JLabel("방제목");
 		label.setHorizontalAlignment(SwingConstants.CENTER);
 		label.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		label.setBounds(58, 21, 117, 19);
+		label.setBackground(new Color(255,0,0,0));
+		label.setForeground(Color.YELLOW);
 		panel_1.add(label);
 		
-		JLabel label_1 = new JLabel("\uC778\uC6D0\uC218");
+		JLabel label_1 = new JLabel("인원수");
 		label_1.setBounds(171, 21, 54, 19);
 		panel_1.add(label_1);
 		label_1.setHorizontalAlignment(SwingConstants.CENTER);
 		label_1.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
+		label_1.setBackground(new Color(255,0,0,0));
+		label_1.setForeground(Color.YELLOW);
 		
-		JLabel label_2 = new JLabel("\uACF5\uAC1C");
+		JLabel label_2 = new JLabel("공개");
 		label_2.setHorizontalAlignment(SwingConstants.CENTER);
 		label_2.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		label_2.setBounds(224, 21, 48, 19);
+		label_2.setBackground(new Color(255,0,0,0));
+		label_2.setForeground(Color.YELLOW);
 		panel_1.add(label_2);
 		
-		JLabel label_3 = new JLabel("\uBC29\uC7A5");
+		JLabel label_3 = new JLabel("방장");
 		label_3.setHorizontalAlignment(SwingConstants.CENTER);
 		label_3.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		label_3.setBounds(271, 21, 45, 19);
+		label_3.setBackground(new Color(255,0,0,0));
+		label_3.setForeground(Color.YELLOW);
 		panel_1.add(label_3);
 		//\uB85C\uADF8\uC544\uC6C3"
-		btnCreateRoom = new JButton("\uBC29\uB9CC\uB4E4\uAE30");
-		btnCreateRoom.setFont(new Font("", Font.BOLD, 14));
+		btnCreateRoom = new JButton(new ImageIcon("src/buttonImg/createRoom.png"));
 		btnCreateRoom.setBounds(22, 254, 129, 36);
 		btnCreateRoom.addActionListener(this);
+		btnCreateRoom.setBorderPainted(false);
+		btnCreateRoom.setContentAreaFilled(false);
 		contentPane.add(btnCreateRoom);
 		
-		btnJoin = new JButton("방입장");
-		btnJoin.setFont(new Font("�ü�", Font.BOLD, 14));
+		btnJoin = new JButton(new ImageIcon("src/buttonImg/join.png"));
 		btnJoin.setBounds(163, 254, 129, 36);
 		btnJoin.addActionListener(this);
+		btnJoin.setBorderPainted(false);
+		btnJoin.setContentAreaFilled(false);
 		contentPane.add(btnJoin);
 	}
 	@Override
@@ -142,7 +168,7 @@ public class UIWaitRoom extends JFrame implements ActionListener, MouseListener 
 		isSelected = true;
 		String selectedRoomInfo = String.valueOf(((JList) e.getSource()).getSelectedValue());
 		System.out.println("selectedRoomInfo : " + selectedRoomInfo);
-		if(!selectedRoomInfo.equals(null)) {
+		if(!selectedRoomInfo.equals("")) {
 			System.out.println("zz   " + selectedRoomInfo);
 			StringTokenizer st = new StringTokenizer(selectedRoomInfo, ",");
 			roomNo = Integer.parseInt(st.nextToken());

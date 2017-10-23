@@ -152,8 +152,25 @@ public class WaitingRoom implements CommonConstant{
     public void removeChattingUser(String id, int roomNo) {
     	if(roomNo != 0) {
     		ChattingRoom chattingRoom = (ChattingRoom)rooms.get(roomNo);
-    	   	chattingRoom.delUser(id);
+    		
+    		chattingRoom.delUser(id);
     	   	chattingRoom.setMemberCount(chattingRoom.users.size());
+    		
+    		if(chattingRoom.getAdminID().equals(id)) {
+    			Enumeration enu = chattingRoom.users.keys();
+    			while(enu.hasMoreElements()) {
+    				chattingRoom.setAdminID(enu.nextElement().toString());
+    			}
+ 
+    			Enumeration enu2 = chattingRoom.users.keys();
+    			while(enu2.hasMoreElements()) {
+    				serverThread a = (serverThread) chattingRoom.users.get(enu2.nextElement());
+    				a.send(ADMIN_RESET + SEPA + chattingRoom.getAdminID());
+    			}
+ 
+    		}  
+    	}else if(roomNo==0) {
+    		delUser(id);
     	}
     }
 }

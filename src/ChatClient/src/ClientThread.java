@@ -1,6 +1,6 @@
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -8,6 +8,8 @@ import java.net.Socket;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
@@ -29,6 +31,12 @@ public class ClientThread extends Thread implements CommonConstant {
 	private UIWaitRoom UiWaitRoom;
 	private UIChattingRoom UiChattingRoom;
 	private Login lg;
+	// 회원 정보 조회 데이터
+	public String searchId;
+	public String searchSex;
+	public String searchGrade;
+	public String searchWin;
+	public String searchLose;
 
 	public ClientThread() {
 		try {
@@ -69,6 +77,7 @@ public class ClientThread extends Thread implements CommonConstant {
 				int cmd = Integer.parseInt(st.nextToken());
 				switch (cmd) {
 				case LOGIN_SUCCESS: {
+					Sound("src/login.wav");
 					JOptionPane.showConfirmDialog(null, "로그인이 완료 되었습니다.", "메세지", JOptionPane.CLOSED_OPTION,
 							JOptionPane.INFORMATION_MESSAGE);
 					UiWaitRoom = new UIWaitRoom(this);
@@ -255,6 +264,65 @@ public class ClientThread extends Thread implements CommonConstant {
 					JOptionPane.showMessageDialog(null, "사용가능한 아이디입니다.");
 					break;
 				}
+
+				case GAME_WIN: {
+					Sound("src/승리.wav");
+					UiChattingRoom.win();
+					buf.setLength(0);
+					buf.append(UPDATE_INFO);
+					buf.append(SEPA);
+					buf.append(this.dto.getMemberId());
+					buf.append(SEPA);
+					buf.append(this.dto.getWins());
+					buf.append(SEPA);
+					send(buf.toString());
+					break;
+				}
+
+				case GAME_LOSE: {
+					Sound("src/패배.wav");
+					UiChattingRoom.lose();
+					buf.setLength(0);
+					buf.append(UPDATE_INFO);
+					buf.append(SEPA);
+					buf.append(this.dto.getMemberId());
+					buf.append(SEPA);
+					buf.append(this.dto.getLoses());
+					buf.append(SEPA);
+					send(buf.toString());
+					break;
+				}
+
+				case ADMIN_RESET: {
+					UiChattingRoom.AdminID = st.nextToken();
+					break;
+				}
+
+				case SOUND: {
+					Sound("src/" + st.nextToken());
+					break;
+				}
+				case MEMPRO_SUCCESS: {
+					searchId = st.nextToken();
+					searchSex = st.nextToken();
+					searchGrade = st.nextToken();
+					searchWin = st.nextToken();
+					searchLose = st.nextToken();
+					new meminfoframe(this);
+					break;
+				}
+				
+				case WIN_LOSE_DTO_UPDATE: {
+					String win = st.nextToken();
+					String lose = st.nextToken();
+					dto.setWins(Integer.parseInt(win));
+					dto.setLoses(Integer.parseInt(lose));
+					
+					if(UiChattingRoom != null) {
+						UiChattingRoom.infUpdate(dto.getWins(), dto.getLoses());
+					}
+					break;
+				}
 				}
 			}
 		} catch (IOException e) {
@@ -323,7 +391,11 @@ public class ClientThread extends Thread implements CommonConstant {
 			buf.append(id);
 			buf.append(SEPA);
 			buf.append(password);
-			send(buf.toString());
+			if (id.equals("") || password.equals("")) {
+				JOptionPane.showMessageDialog(null, "아이디 또는 비밀번호를 입력하세요");
+			} else {
+				send(buf.toString());
+			}
 
 			System.out.println("login" + buf.toString());
 		} else if (ans == JOptionPane.NO_OPTION) {
@@ -352,6 +424,15 @@ public class ClientThread extends Thread implements CommonConstant {
 		}
 		return false;
 
+	}
+
+	public void mempro(String id) {
+		buf.setLength(0);
+		buf.append(MEMPRO);
+		buf.append(SEPA);
+		buf.append(id);
+		send(buf.toString());
+		System.out.println("mempro : " + buf.toString());
 	}
 
 	public void logOut() {
@@ -414,5 +495,16 @@ public class ClientThread extends Thread implements CommonConstant {
 		buf.append(MEMBERSHIP + SEPA + string + SEPA + string2 + SEPA + string3 + SEPA + string4 + SEPA + string5 + SEPA
 				+ string6 + SEPA + String.valueOf(cs));
 		send(buf.toString());
+	}
+
+	public void Sound(String name) {
+		try {
+			File Clap = new File(name);
+			Clip clip = AudioSystem.getClip();
+			clip.open(AudioSystem.getAudioInputStream(Clap));
+			clip.start();
+		} catch (Exception ex) {
+
+		}
 	}
 }

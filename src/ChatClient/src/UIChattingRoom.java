@@ -3,17 +3,25 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.FileInputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -36,8 +44,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 public class UIChattingRoom extends JFrame
-		implements ActionListener, KeyListener, ListSelectionListener, Runnable, CommonConstant {
-
+		implements ActionListener, KeyListener, ListSelectionListener, Runnable, CommonConstant, MouseListener {
 	private JPanel contentPane;
 	private JTextField tfMsg;
 	public static JTextArea taChatting;
@@ -49,6 +56,7 @@ public class UIChattingRoom extends JFrame
 	private String selectedId;
 	private int myTurn;
 	private int maxMember;
+	JLabel memidlb, memsexlb, memgradelb, memwinlb, memloselb;
 
 	public int getMaxMember() {
 		return maxMember;
@@ -119,6 +127,10 @@ public class UIChattingRoom extends JFrame
 	JButton btn40;
 	JButton mainCard;
 
+	JButton confirm;
+
+	ImageIcon icon;
+
 	static JButton subCard; // 카드뽑기
 
 	DefaultTableModel tableModel;
@@ -129,22 +141,38 @@ public class UIChattingRoom extends JFrame
 	Socket socket = null;
 	Thread th;
 
-	JTextArea turn1;
-	JTextArea turn2;
-	JTextArea turn3;
-	JTextArea turn4;
+	JButton turn1;
+	JButton turn2;
+	JButton turn3;
+	JButton turn4;
+	JLabel winImage;
+	JLabel loseImage;
 
 	public UIChattingRoom(ClientThread clientThread) {
-		turn1 = new JTextArea("turn");
+
+		confirm = new JButton(new ImageIcon("src/buttonImg/ok.png"));
+		confirm.setBorderPainted(false);
+		confirm.setContentAreaFilled(false);
+		confirm.addActionListener(this);
+
+		turn1 = new JButton(new ImageIcon("src/buttonImg/turn1.png"));// 아래쪽
+		turn1.setBorderPainted(false);
+		turn1.setContentAreaFilled(false);
 		turn1.setVisible(false);
 
-		turn2 = new JTextArea("turn");
+		turn2 = new JButton(new ImageIcon("src/buttonImg/turn2.png"));// 위쪽
+		turn2.setBorderPainted(false);
+		turn2.setContentAreaFilled(false);
 		turn2.setVisible(false);
 
-		turn3 = new JTextArea("turn");
+		turn3 = new JButton(new ImageIcon("src/buttonImg/turn3.png"));// 왼쪽
+		turn3.setBorderPainted(false);
+		turn3.setContentAreaFilled(false);
 		turn3.setVisible(false);
 
-		turn4 = new JTextArea("turn");
+		turn4 = new JButton(new ImageIcon("src/buttonImg/turn4.png"));// 오른쪽
+		turn4.setBorderPainted(false);
+		turn4.setContentAreaFilled(false);
 		turn4.setVisible(false);
 
 		setSize(new Dimension(510, 340));
@@ -160,39 +188,79 @@ public class UIChattingRoom extends JFrame
 		contentPane.setLayout(null);
 
 		JPanel panel = new JPanel();
-		panel.setBorder(new TitledBorder(null, "채팅창", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel.setBorder(new TitledBorder(null, "채팅창", TitledBorder.LEADING, TitledBorder.TOP, null, Color.YELLOW));
 		panel.setBounds(1200, 500, 330, 186);
 		contentPane.add(panel);
+		panel.setBackground(new Color(255, 0, 0, 0));
 		panel.setLayout(null);
 
 		taChatting = new JTextArea(); // 채팅 메세지 입력 창
 		taChatting.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-		taChatting.setBounds(12, 21, 313, 155);
-		panel.add(taChatting);
+		// taChatting.setBounds(12, 21, 313, 155);
+		// panel.add(taChatting);
+
+		taChatting.setEditable(false);
+
+		JScrollPane scroll = new JScrollPane(taChatting);
+		scroll.setBounds(12, 21, 313, 155);
+		panel.add(scroll);
+		icon = new ImageIcon("src/img/background.PNG");
+
+		JPanel backPan = new JPanel() {
+			public void paintComponent(Graphics g) {
+				g.drawImage(icon.getImage(), 0, 0, 1600, 900, null);
+				setOpaque(false);
+				super.paintComponent(g);
+			}
+		};
 
 		JPanel panel_1 = new JPanel();
 		panel_1.setLayout(null);
 		panel_1.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "참여자 리스트", TitledBorder.LEADING,
-				TitledBorder.TOP, null, new Color(0, 0, 0)));
+				TitledBorder.TOP, null, Color.YELLOW));
 		panel_1.setBounds(1200, 100, 330, 100);
+		panel_1.setBackground(new Color(255, 0, 0, 0));
 		contentPane.add(panel_1);
 
 		JPanel panel_2 = new JPanel();
 		panel_2.setLayout(null);
-		panel_2.setBorder(new TitledBorder(null, "내 프로필", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel_2.setBorder(new TitledBorder(null, "내 프로필", TitledBorder.LEADING, TitledBorder.TOP, null, Color.YELLOW));
 		panel_2.setBounds(1200, 300, 330, 120);
+		panel_2.setBackground(new Color(255, 0, 0, 0));
+
 		contentPane.add(panel_2);
 
-		JLabel userID = new JLabel("ID");
-		userID.setBounds(12, 21, 10, 10);
-		// userID.setLayout(null);
+		// 아이디
+		memidlb = new JLabel("아이디 : " + clientThread.dto.getMemberId());
+		memidlb.setBounds(10, 20, 120, 30);
+		panel_2.add(memidlb);
 
-		panel_2.add(userID);
+		// 성별
+		memsexlb = new JLabel("성별 : " + clientThread.dto.getMemberGender());
+		memsexlb.setBounds(10, 45, 120, 30);
+		panel_2.add(memsexlb);
+
+		// 등급
+		memgradelb = new JLabel("랭크 : " + clientThread.dto.getRank());
+		memgradelb.setBounds(10, 70, 120, 30);
+		panel_2.add(memgradelb);
+
+		// 승
+		memwinlb = new JLabel("승 : " + clientThread.dto.getWins());
+		System.out.println("win : " + clientThread.dto.getWins());
+		memwinlb.setBounds(10, 95, 120, 30);
+		panel_2.add(memwinlb);
+
+		// 패
+		memloselb = new JLabel("패 : " + clientThread.dto.getLoses());
+		memloselb.setBounds(10, 120, 120, 30);
+		panel_2.add(memloselb);
 
 		listMember = new JList(); // 방유저 목록
 		listMember.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		listMember.setBounds(10, 25, 313, 60);
 		listMember.addListSelectionListener(this);
+		listMember.addMouseListener(this);
 		panel_1.add(listMember);
 
 		tfMsg = new JTextField(); // 메세지 입력창
@@ -201,28 +269,40 @@ public class UIChattingRoom extends JFrame
 		contentPane.add(tfMsg);
 		tfMsg.setColumns(10);
 
-		btnOut = new JButton("강퇴"); // 강퇴버튼
+		btnOut = new JButton(new ImageIcon("src/buttonImg/pk.png")); // 강퇴버튼
 		btnOut.setBounds(1200, 730, 97, 23);
 		btnOut.addActionListener(this);
+		btnOut.setBorderPainted(false);
+		btnOut.setContentAreaFilled(false);
 		contentPane.add(btnOut);
 
-		btnClose = new JButton("나가기"); // 나가기버튼
+		btnClose = new JButton(new ImageIcon("src/buttonImg/out.png")); // 나가기버튼
 		btnClose.setBounds(1350, 730, 97, 23);
 		btnClose.addActionListener(this);
+		btnClose.setBorderPainted(false);
+		btnClose.setContentAreaFilled(false);
 		contentPane.add(btnClose);
 
 		// JPanel cardPan = new JPanel();
 		th = new Thread(this);
 		th.start();
 
-		mainCard = new JButton(new ImageIcon("gameClient/src/img/BackCard.jpg"));
+		mainCard = new JButton();
+		mainCard.setIcon(new ImageIcon("src/img/BackCard.jpg"));
+		mainCard.setBorderPainted(false);
+		mainCard.setFocusPainted(false);
+		mainCard.setContentAreaFilled(false);
 		/*
 		 * mainCard.setBorderPainted(false); mainCard.setFocusPainted(false);
 		 * mainCard.setContentAreaFilled(false);
 		 */
 		mainCard.setBounds(650, 325, 80, 115);
 
-		subCard = new JButton(); //
+		subCard = new JButton();
+		subCard.setIcon(new ImageIcon("src/img/BackCard.jpg"));
+		subCard.setBorderPainted(false);
+		subCard.setFocusPainted(false);
+		subCard.setContentAreaFilled(false);
 		/*
 		 * subCard.setBorderPainted(false); subCard.setFocusPainted(false);
 		 * subCard.setContentAreaFilled(false);
@@ -252,6 +332,7 @@ public class UIChattingRoom extends JFrame
 		aList.add(btn10);
 		userTable1.setBounds(150, 700, 800, 100);
 		turn1.setBounds(300, 600, 100, 50);
+		userTable1.setOpaque(false);
 
 		JPanel userTable2 = new JPanel(new GridLayout(1, 10)); // 2번사용자 버튼 위
 		userTable2.add(btn11 = new JButton());
@@ -276,6 +357,7 @@ public class UIChattingRoom extends JFrame
 		enemyCardList1.add(btn20);
 		userTable2.setBounds(150, 10, 800, 100);
 		turn2.setBounds(810, 250, 100, 50);
+		userTable2.setOpaque(false);
 
 		JPanel userTable3 = new JPanel(new GridLayout(10, 1)); // 3번 사용자 버튼 왼쪽
 		userTable3.add(btn21 = new JButton());
@@ -300,6 +382,7 @@ public class UIChattingRoom extends JFrame
 		enemyCardList2.add(btn30);
 		userTable3.setBounds(10, 100, 100, 600);
 		turn3.setBounds(300, 300, 100, 50);
+		userTable3.setOpaque(false);
 
 		JPanel userTable4 = new JPanel(new GridLayout(10, 1)); // 4번 사용자 버튼 오른쪽
 		userTable4.add(btn31 = new JButton());
@@ -324,21 +407,40 @@ public class UIChattingRoom extends JFrame
 		enemyCardList3.add(btn40);
 		userTable4.setBounds(990, 100, 100, 600);
 		turn4.setBounds(800, 600, 100, 50);
+		userTable4.setOpaque(false);
 
-		JPanel jp = new JPanel();// 게임판 전채 판
-		jp.add(userTable1);
-		jp.add(userTable2);
-		jp.add(userTable3);
-		jp.add(userTable4);
-		jp.add(mainCard);
-		jp.add(subCard);
-		jp.setLayout(null);
+		winImage = new JLabel(new ImageIcon("src/buttonImg/win.png"));
+		winImage.setBounds(120, 100, 960, 686);
+		winImage.setOpaque(false);
+		winImage.setVisible(false);
+
+		loseImage = new JLabel(new ImageIcon("src/buttonImg/lose.png"));
+		loseImage.setBounds(120, 50, 960, 686);
+		loseImage.setOpaque(false);
+		loseImage.setVisible(false);
+
+		confirm.setBounds(550, 600, 100, 50);
+		confirm.setVisible(false);
+
+		JScrollPane jp = new JScrollPane(backPan);// 게임판 전채 판
+		backPan.add(confirm);
+		backPan.add(winImage);
+		backPan.add(loseImage);
+		backPan.add(userTable1);
+		backPan.add(userTable2);
+		backPan.add(userTable3);
+		backPan.add(userTable4);
+		backPan.add(mainCard);
+		backPan.add(subCard);
+		backPan.setLayout(null);
+
 		add(turn1);
 		add(turn2);
 		add(turn3);
 		add(turn4);
+
 		// 게임판 크기
-		jp.setBounds(10, 10, 1500, 900);
+		jp.setBounds(10, 10, 1600, 900);
 		add(jp);
 
 		// 버튼 이미지 가리기
@@ -402,21 +504,26 @@ public class UIChattingRoom extends JFrame
 				isSelected = false;
 			}
 		} else if (e.getSource() == btnClose) {
-			clientThread.send(CLOSECHATROOM + SEPA + clientThread.dto.getMemberId());
+			clientThread.send(CLOSECHATROOM + SEPA);
 			this.dispose();
-		}
-
-		for (int i = 0; i < aList.size(); i++) {
-			if (e.getSource() == aList.get(i)) {
-				System.out.println(i);
-				clientThread.send("" + SELECTCARD + SEPA + i);
-				break;
+		} else if (e.getSource() == mainCard) {
+			clientThread.Sound("src/flipcard.wav");
+			clientThread.send("" + SELECTCARD + SEPA + "10");
+		} else if (e.getSource() == confirm) {
+			winImage.setVisible(false);
+			loseImage.setVisible(false);
+			confirm.setVisible(false);
+		} else {
+			for (int i = 0; i < aList.size(); i++) {
+				if (e.getSource() == aList.get(i)) {
+					clientThread.Sound("src/flipcard.wav");
+					System.out.println(i);
+					clientThread.send(SELECTCARD + SEPA + i);
+					break;
+				}
 			}
 		}
 
-		if (e.getSource() == mainCard) {
-			clientThread.send("" + SELECTCARD + SEPA + "10");
-		}
 	}
 
 	@Override
@@ -446,6 +553,11 @@ public class UIChattingRoom extends JFrame
 
 	}
 
+	public void infUpdate(int win, int lose) {
+		 memwinlb.setText("" + win);
+		 memloselb.setText("" + lose);
+	}
+	
 	public void ClearData() {
 		tfMsg.setText("");
 	}
@@ -604,5 +716,122 @@ public class UIChattingRoom extends JFrame
 				turn4.setVisible(false);
 			}
 		}
+	}
+
+	public void win() {
+		winImage.setVisible(true);
+		confirm.setVisible(true);
+		clientThread.dto.setWins(clientThread.dto.getWins() + 1);
+	}
+
+	public void lose() {
+		loseImage.setVisible(true);
+		confirm.setVisible(true);
+		clientThread.dto.setLoses(clientThread.dto.getLoses() + 1);
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		Object obj = e.getSource();
+		if (obj == listMember && e.getClickCount() == 2) {
+			selectedId = String.valueOf(((JList) e.getSource()).getSelectedValue());
+			clientThread.mempro(selectedId);
+		}
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+}
+
+class meminfoframe extends JFrame implements ActionListener {
+
+	JLabel memidlb, memsexlb, memgradelb, memwinlb, memloselb, memvaluelb;
+	JButton okB;
+	ClientThread ct;
+
+	public meminfoframe(ClientThread ct) {
+		this.ct = ct;
+
+		JPanel idP = new JPanel();
+
+		// 아이디
+		memidlb = new JLabel("아이디 : " + ct.searchId);
+		memidlb.setBounds(30, 30, 200, 50);
+		add(memidlb);
+
+		// 성별
+		memsexlb = new JLabel("성별 : " + ct.searchSex);
+		memsexlb.setBounds(30, 50, 200, 50);
+		add(memsexlb);
+
+		// 등급
+		memgradelb = new JLabel("등급 : " + ct.searchGrade);
+		memgradelb.setBounds(30, 140, 100, 30);
+		add(memgradelb);
+
+		// 승
+		memwinlb = new JLabel("승 : " + ct.searchWin);
+		memwinlb.setBounds(30, 170, 100, 30);
+		add(memwinlb);
+
+		// 패
+		memloselb = new JLabel("패 : " + ct.searchLose);
+		memloselb.setBounds(30, 200, 100, 30);
+		add(memloselb);
+
+		// // 경험치
+		// memsexlb = new JLabel("경험치 : " );
+		// memsexlb.setBounds(30, 140, 100, 30);
+		// add(memsexlb);
+
+		// 확인, 취소 버튼
+		okB = new JButton(new ImageIcon("src/buttonImg/ok.png"));
+		okB.setBounds(130, 330, 60, 30);
+		okB.setBorderPainted(false);
+		okB.setContentAreaFilled(false);
+		add(okB);
+
+		add(idP);// 붙이기
+
+		// 버튼 리스너
+		okB.addActionListener(this);
+
+		setTitle("회원정보");
+		setSize(330, 420);
+		setVisible(true);
+		setLocationRelativeTo(null);
+
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		Object obj = e.getSource();
+
+		if (obj == okB) {
+			this.dispose();
+		}
+
 	}
 }

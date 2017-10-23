@@ -203,6 +203,7 @@ public class MemberDAO {
 		return aList;
 	} // 멤버 리스트 조회
 
+<<<<<<< HEAD
 	///////// 승패 관련 메소드
 
 	public void plusWinRate(MemberDTO winDTO) {
@@ -242,6 +243,25 @@ public class MemberDAO {
 
 			pstmt.executeQuery();
 
+=======
+	public void WinupdatePlayerInfo(MemberDTO dto , serverThread sv) {
+
+		try {
+			System.out.println("win : " + dto.getWins() + 1);
+
+			conn = init();
+			String sql = "UPDATE win_lose SET win_rate=?, win_count=?, lose_count=?, ranking=? WHERE id=?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setFloat(1, dto.calRate());
+			pstmt.setInt(2, dto.getWins() + 1);
+			sv.dto.setWins(dto.getWins() + 1);
+			pstmt.setInt(3, dto.getLoses());
+			pstmt.setInt(4, dto.getRank());
+			pstmt.setString(5, dto.getMemberId());
+
+			pstmt.executeQuery();
+			System.out.println("win : " + dto.getWins() + 1);
+>>>>>>> 0d59b2756405188085fd003997ee5d0ef3081d7b
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -251,6 +271,7 @@ public class MemberDAO {
 				e.printStackTrace();
 			}
 		}
+<<<<<<< HEAD
 	} // 패수 변경
 
 	public Vector<MemberDTO> getWinRateInfo(MemberDTO winDTO) {
@@ -306,6 +327,25 @@ public class MemberDAO {
 				winDTO.setWins(rs.getInt("r.win_count"));
 				winDTO.setLoses(rs.getInt("r.lose_count"));
 			}
+=======
+	} // 게임 끝난 후 디비 업데이트
+
+	public void LoseupdatePlayerInfo(MemberDTO dto,  serverThread sv) {
+
+		try {
+			conn = init();
+			String sql = "UPDATE win_lose SET win_rate=?, win_count=?, lose_count=?, ranking=? WHERE id=?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setFloat(1, dto.calRate());
+			pstmt.setInt(2, dto.getWins());
+			pstmt.setInt(3, dto.getLoses() + 1);
+			sv.dto.setLoses(dto.getLoses() + 1);
+
+			pstmt.setInt(4, dto.getRank());
+			pstmt.setString(5, dto.getMemberId());
+
+			pstmt.executeQuery();
+>>>>>>> 0d59b2756405188085fd003997ee5d0ef3081d7b
 
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
@@ -316,9 +356,14 @@ public class MemberDAO {
 				e.printStackTrace();
 			}
 		}
+<<<<<<< HEAD
 		return winDTO;
 	}
 
+=======
+	} // 게임 끝난 후 디비 업데이트
+	
+>>>>>>> 0d59b2756405188085fd003997ee5d0ef3081d7b
 	public int countPlayers() {
 		int counts = 0;
 		try {

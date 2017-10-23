@@ -1,4 +1,4 @@
-
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.regex.Matcher;
@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -16,23 +17,30 @@ import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
+@SuppressWarnings("serial")
 class Login extends JFrame implements ActionListener {
 	JTextField idtf;
 	JPasswordField pwtf;
 	JButton logB, regB;
 	JLabel idlb, pwlb;
 	ClientThread ct;
-	 RegisterFrame registerFrame;
+	RegisterFrame registerFrame;
+
 	public Login(ClientThread ct) {
 		this.ct = ct;
-		idlb = new JLabel("ID : ");
+		idlb = new JLabel("   ID : ");
 		pwlb = new JLabel("PW : ");
 
 		idtf = new JTextField(10);
 		pwtf = new JPasswordField(10);
 
-		logB = new JButton("로그인");
-		regB = new JButton("회원가입");
+		logB = new JButton(new ImageIcon("src/buttonImg/logBtn.png"));
+		regB = new JButton(new ImageIcon("src/buttonImg/regBtn.png"));
+
+		logB.setBorderPainted(false);
+		logB.setContentAreaFilled(false);
+		regB.setBorderPainted(false);
+		regB.setContentAreaFilled(false);
 
 		JPanel pwP = new JPanel();
 		pwP.add(pwlb);
@@ -57,7 +65,7 @@ class Login extends JFrame implements ActionListener {
 		regB.addActionListener(this);
 
 		setTitle("로그인");
-		setSize(200, 200);
+		setSize(230, 200);
 		setVisible(true);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -67,7 +75,21 @@ class Login extends JFrame implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		Object obj = e.getSource();
 		if (obj == logB) {
-			ct.login(idtf.getText(), pwtf.getText());
+			String name;
+			String pass;
+
+			if (idtf.getText() == null) {
+				name = " ";
+			} else {
+				name = idtf.getText();
+			}
+
+			if (pwtf.getPassword().equals("")) {
+				pass = " ";
+			} else {
+				pass = String.valueOf(pwtf.getPassword());
+			}
+			ct.login(name, pass);
 		} else if (obj == regB) {
 			registerFrame = new RegisterFrame(ct);
 		}
@@ -75,7 +97,9 @@ class Login extends JFrame implements ActionListener {
 	}
 }
 
+@SuppressWarnings("serial")
 class RegisterFrame extends JFrame implements ActionListener, CommonConstant {
+
 	JTextField idtf2, namef, agef, emailf;
 	JPasswordField pwtf2, pwchktf;
 	JLabel idlb2, pwlb2, namelb, agelb, emaillb, sexlb, loclb, pwchklb;
@@ -206,7 +230,7 @@ class RegisterFrame extends JFrame implements ActionListener, CommonConstant {
 		Object obj = e.getSource();
 		String email = emailf.getText();
 		String id = idtf2.getText();
-		String pw = pwtf2.getText();
+		String pw = String.valueOf(pwtf2.getPassword());
 
 		if (obj == chkB) {// 중복확인버튼
 			ct.send(IDCHECK + SEPA + idtf2.getText());
@@ -259,7 +283,7 @@ class RegisterFrame extends JFrame implements ActionListener, CommonConstant {
 
 	// 비밀번호 길이체크
 	public boolean chkPW_Length(String pw) {
-		pw = pwtf2.getText();
+		pw = String.valueOf(pwtf2.getPassword());
 		if (pw.length() < 6 || pw.length() > 10) {
 			return true;
 		}

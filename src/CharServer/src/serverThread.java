@@ -347,18 +347,15 @@ public class serverThread extends Thread implements CommonConstant {
 				}
 
 				case CLOSECHATROOM: {
-
-					String id;
-
-					id = st.nextToken();
 					removeUser();
 					// chattingRoom.delUser(id);
-					waitingRoom.addUser(id, this);
+					waitingRoom.addUser(dto.getMemberId(), this);
 
 					buf.setLength(0);
 					buf.append(CLOSECHATROOM_SUCCESS);
 					buf.append(SEPA);
 					send(buf.toString());
+
 					if (waitingRoom.getRooms().get(roomNo) == null) {
 
 					} else {
@@ -399,7 +396,6 @@ public class serverThread extends Thread implements CommonConstant {
 					break;
 				}
 				case IDCHECK: {
-					MemberDAO dao = MemberDAO.getInstance();
 					String name = st.nextToken();
 					if (dao.memberShipChk(name)) { // 아이디가 있음.
 						buf.setLength(0);
@@ -412,10 +408,38 @@ public class serverThread extends Thread implements CommonConstant {
 					}
 					break;
 				} // end IDCHECK//////////////////////
+				case MEMPRO: { // 회원 프로필 조회
+					String id = st.nextToken();
+
+					if (roomNo == 0) {
+						// waitingRoom.
+					} else {
+						ChattingRoom cr = waitingRoom.Join(roomNo);
+
+						buf.setLength(0);
+						buf.append(MEMPRO_SUCCESS);
+						buf.append(SEPA);
+						buf.append(cr.getUserIdData(id));
+						buf.append(SEPA);
+
+						send(buf.toString());
+						System.out.println("MEMPRO_SUCCESS : " + buf.toString());
+					}
+					break;
+				}
+
 				}
 			}
 		} catch (IOException e) {
 			removeUser();
+			try {
+				SendUserList();
+				SendRoomList();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
 			try {
 				if (output != null) {
 					output.close();
@@ -454,7 +478,6 @@ public class serverThread extends Thread implements CommonConstant {
 			rg = null;
 		}
 		try {
-			waitingRoom.delUser(dto.getMemberId());
 			waitingRoom.removeChattingUser(dto.getMemberId(), roomNo);
 		} catch (NullPointerException e) {
 			System.out.println("지울 정보가 없습니다");
