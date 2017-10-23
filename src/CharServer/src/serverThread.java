@@ -224,7 +224,8 @@ public class serverThread extends Thread implements CommonConstant {
 						buf.setLength(0);
 						int countPlayer = dao.countPlayers();
 						buf.append(MEMBERSHIP_SUCCESS);
-						dao.insertMember(MemberId, MemberName, MemberGender, MemberAge, MemberEmail, MemberLocation,MemberPassword,countPlayer); // 데이타베이스에 회원 추가
+						dao.insertMember(MemberId, MemberName, MemberGender, MemberAge, MemberEmail, MemberLocation,
+								MemberPassword, countPlayer); // 데이타베이스에 회원 추가
 						System.out.println("등록 성공");
 					}
 					send(buf.toString());

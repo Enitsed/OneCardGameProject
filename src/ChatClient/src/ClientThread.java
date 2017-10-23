@@ -2,6 +2,7 @@
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.StringTokenizer;
@@ -31,7 +32,7 @@ public class ClientThread extends Thread implements CommonConstant {
 
 	public ClientThread() {
 		try {
-			socket = new Socket("192.168.10.25", 555);
+			socket = new Socket(Inet4Address.getLocalHost(), 555);
 			input = new DataInputStream(socket.getInputStream());
 			output = new DataOutputStream(socket.getOutputStream());
 			buf = new StringBuffer(1024);
