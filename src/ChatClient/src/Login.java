@@ -24,8 +24,7 @@ class Login extends JFrame implements ActionListener {
 	JButton logB, regB;
 	JLabel idlb, pwlb;
 	ClientThread ct;
-	RegisterFrame registerFrame;
-
+	 RegisterFrame registerFrame;
 	public Login(ClientThread ct) {
 		this.ct = ct;
 		idlb = new JLabel("   ID : ");
@@ -36,11 +35,12 @@ class Login extends JFrame implements ActionListener {
 
 		logB = new JButton(new ImageIcon("src/buttonImg/logBtn.png"));
 		regB = new JButton(new ImageIcon("src/buttonImg/regBtn.png"));
-
+		
 		logB.setBorderPainted(false);
 		logB.setContentAreaFilled(false);
 		regB.setBorderPainted(false);
 		regB.setContentAreaFilled(false);
+		
 
 		JPanel pwP = new JPanel();
 		pwP.add(pwlb);
@@ -77,17 +77,18 @@ class Login extends JFrame implements ActionListener {
 		if (obj == logB) {
 			String name;
 			String pass;
-
-			if (idtf.getText() == null) {
+			
+			if(idtf.getText() == null) {
 				name = " ";
-			} else {
+			}else
+			{
 				name = idtf.getText();
 			}
-
-			if (pwtf.getPassword().equals("")) {
+			
+			if(pwtf.getPassword().equals("")) {
 				pass = " ";
-			} else {
-				pass = String.valueOf(pwtf.getPassword());
+			}else {
+				pass = String.valueOf(pwtf.getPassword());	
 			}
 			ct.login(name, pass);
 		} else if (obj == regB) {

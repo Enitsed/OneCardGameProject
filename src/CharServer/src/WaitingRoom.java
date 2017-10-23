@@ -67,6 +67,16 @@ public class WaitingRoom implements CommonConstant{
         return 0;  
     }
     
+    public String getUserIdData(String id) {
+		serverThread data = (serverThread) users.get(id);
+		String searchId = data.dto.getMemberId();
+		String searchSex = data.dto.getMemberGender();
+		int searchGrade = data.dto.getRank();
+		int searchWin = data.dto.getWins();
+		int searchLose = data.dto.getLoses();
+
+		return searchId + "|" + searchSex + "|" + searchGrade + "|" + searchWin + "|" + searchLose;
+	}
     public String getUserList(){
         StringBuffer buf = new StringBuffer();
         String ids;

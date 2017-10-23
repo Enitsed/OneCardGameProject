@@ -224,8 +224,7 @@ public class serverThread extends Thread implements CommonConstant {
 						buf.setLength(0);
 						int countPlayer = dao.countPlayers();
 						buf.append(MEMBERSHIP_SUCCESS);
-						dao.insertMember(MemberId, MemberName, MemberGender, MemberAge, MemberEmail, MemberLocation,
-								MemberPassword, countPlayer); // 데이타베이스에 회원 추가
+						dao.insertMember(MemberId, MemberName, MemberGender, MemberAge, MemberEmail, MemberLocation,MemberPassword,countPlayer); // 데이타베이스에 회원 추가
 						System.out.println("등록 성공");
 					}
 					send(buf.toString());
@@ -350,12 +349,12 @@ public class serverThread extends Thread implements CommonConstant {
 					removeUser();
 					// chattingRoom.delUser(id);
 					waitingRoom.addUser(dto.getMemberId(), this);
-
+					
 					buf.setLength(0);
 					buf.append(CLOSECHATROOM_SUCCESS);
 					buf.append(SEPA);
 					send(buf.toString());
-
+					
 					if (waitingRoom.getRooms().get(roomNo) == null) {
 
 					} else {
@@ -412,7 +411,14 @@ public class serverThread extends Thread implements CommonConstant {
 					String id = st.nextToken();
 
 					if (roomNo == 0) {
-						// waitingRoom.
+						buf.setLength(0);
+						buf.append(MEMPRO_SUCCESS);
+						buf.append(SEPA);
+						buf.append(waitingRoom.getUserIdData(id));
+
+						send(buf.toString());
+						System.out.println("MEMPRO_SUCCESS(WaitingRoom) : " + buf.toString());
+						break;
 					} else {
 						ChattingRoom cr = waitingRoom.Join(roomNo);
 
@@ -423,11 +429,11 @@ public class serverThread extends Thread implements CommonConstant {
 						buf.append(SEPA);
 
 						send(buf.toString());
-						System.out.println("MEMPRO_SUCCESS : " + buf.toString());
+						System.out.println("MEMPRO_SUCCESS(ChattingRoom) : " + buf.toString());
+						break;
 					}
-					break;
 				}
-
+				
 				}
 			}
 		} catch (IOException e) {
@@ -439,7 +445,7 @@ public class serverThread extends Thread implements CommonConstant {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-
+			
 			try {
 				if (output != null) {
 					output.close();

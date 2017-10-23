@@ -18,15 +18,13 @@ public class MemberDAO {
 	private ResultSet rs;
 
 	private MemberDAO() {
-
+	
 	}
-
 	private static MemberDAO dao = new MemberDAO();
 
 	public static MemberDAO getInstance() {
 		return dao;
 	}
-
 	private Connection init() throws ClassNotFoundException, SQLException {
 		Class.forName("oracle.jdbc.OracleDriver");
 
@@ -53,8 +51,7 @@ public class MemberDAO {
 			conn.close();
 	}
 
-	public void insertMember(String id, String name, String sex, int age, String email, String location,
-			String password, int countPlayer) {
+	public void insertMember(String id, String name, String sex, int age, String email, String location, String password, int countPlayer) {
 		try {
 			System.out.println("password : " + id);
 			System.out.println("password : " + name);
@@ -66,9 +63,9 @@ public class MemberDAO {
 			System.out.println("password : " + password);
 			conn = init();
 			String sql = "INSERT ALL " + "INTO mem_info (id, name, sex, age, email, location, join_date, password) "
-					+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?) "
-					+ "INTO win_lose (id, ranking, win_rate, win_count, lose_count) " + "VALUES (?, ?, ?, ?, ?) "
-					+ "SELECT * FROM DUAL";
+		               + "VALUES (?, ?, ?, ?, ?, ?, ?, ?) "
+		               + "INTO win_lose (id, ranking, win_rate, win_count, lose_count) " + "VALUES (?, ?, ?, ?, ?) "
+		               + "SELECT * FROM DUAL";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, id);
 			pstmt.setString(2, name);
@@ -79,14 +76,14 @@ public class MemberDAO {
 			pstmt.setTimestamp(7, new Timestamp(System.currentTimeMillis()));
 			pstmt.setString(8, password);
 
-			// 회원 가입시 승패 테이블 삽입
-			pstmt.setString(9, id);
-			pstmt.setInt(10, countPlayer); // ranking
-			pstmt.setInt(11, 0); // win_rate
-			pstmt.setInt(12, 0); // win_count
-			pstmt.setInt(13, 0); // lose_count
+			 // 회원 가입시 승패 테이블 삽입
+	         pstmt.setString(9, id);
+	         pstmt.setInt(10, countPlayer); // ranking
+	         pstmt.setInt(11, 0); // win_rate
+	         pstmt.setInt(12, 0); // win_count
+	         pstmt.setInt(13, 0); // lose_count
 
-			pstmt.executeQuery();
+			 pstmt.executeQuery();
 
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
@@ -100,6 +97,62 @@ public class MemberDAO {
 		}
 	} // 회원가입 메서드
 
+	public void WinupdatePlayerInfo(MemberDTO dto , serverThread sv) {
+
+	      try {
+	         System.out.println("win : " + dto.getWins() + 1);
+
+	         conn = init();
+	         String sql = "UPDATE win_lose SET win_rate=?, win_count=?, lose_count=?, ranking=? WHERE id=?";
+	         pstmt = conn.prepareStatement(sql);
+	         pstmt.setFloat(1, dto.calRate());
+	         pstmt.setInt(2, dto.getWins() + 1);
+	         sv.dto.setWins(dto.getWins() + 1);
+	         pstmt.setInt(3, dto.getLoses());
+	         pstmt.setInt(4, dto.getRank());
+	         pstmt.setString(5, dto.getMemberId());
+
+	         pstmt.executeQuery();
+	         System.out.println("win : " + dto.getWins() + 1);
+	      } catch (ClassNotFoundException | SQLException e) {
+	         e.printStackTrace();
+	      } finally {
+	         try {
+	            exit();
+	         } catch (SQLException e) {
+	            e.printStackTrace();
+	         }
+	      }
+	   } // 게임 끝난 후 디비 업데이트
+
+	   public void LoseupdatePlayerInfo(MemberDTO dto,  serverThread sv) {
+
+	      try {
+	         conn = init();
+	         String sql = "UPDATE win_lose SET win_rate=?, win_count=?, lose_count=?, ranking=? WHERE id=?";
+	         pstmt = conn.prepareStatement(sql);
+	         pstmt.setFloat(1, dto.calRate());
+	         pstmt.setInt(2, dto.getWins());
+	         pstmt.setInt(3, dto.getLoses() + 1);
+	         sv.dto.setLoses(dto.getLoses() + 1);
+
+	         pstmt.setInt(4, dto.getRank());
+	         pstmt.setString(5, dto.getMemberId());
+
+	         pstmt.executeQuery();
+
+	      } catch (ClassNotFoundException | SQLException e) {
+	         e.printStackTrace();
+	      } finally {
+	         try {
+	            exit();
+	         } catch (SQLException e) {
+	            e.printStackTrace();
+	         }
+	      }
+	   } // 게임 끝난 후 디비 업데이트
+
+	
 	public boolean login(String inputId, String inputPassword) {
 
 		ArrayList<MemberDTO> aList = new ArrayList<MemberDTO>();
@@ -160,12 +213,12 @@ public class MemberDAO {
 		ArrayList<MemberDTO> aList = new ArrayList<MemberDTO>();
 		aList = (ArrayList<MemberDTO>) memberList();
 
-		for (int i = 0; i < aList.size(); i++) {
-			if (aList.get(i).getMemberId().trim().equals(inputId))
-				return true; // 있습니다.
-		}
+		 for (int i = 0; i < aList.size(); i++) {
+	         if (aList.get(i).getMemberId().trim().equals(inputId))
+	            return true; // 있습니다.
+	      }
 
-		return false; // 없습니다.
+	      return false; // 없습니다.
 	} // 회원인지 아닌지 확인 ID로 조회
 
 	public List<MemberDTO> memberList() {
@@ -199,194 +252,147 @@ public class MemberDAO {
 				e.printStackTrace();
 			}
 		}
-
+		
 		return aList;
 	} // 멤버 리스트 조회
 
-<<<<<<< HEAD
-	///////// 승패 관련 메소드
+	  ///////// 승패 관련 메소드
 
-	public void plusWinRate(MemberDTO winDTO) {
+	   public void plusWinRate(MemberDTO winDTO) {
 
-		try {
-			conn = init();
-			String sql = "UPDATE win_lose SET win_rate=?, win_count=?, ranking=? WHERE id=?";
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setFloat(1, winDTO.calRate());
-			pstmt.setInt(2, winDTO.getWins() + 1);
-			pstmt.setInt(3, winDTO.getRank());
-			pstmt.setString(4, winDTO.getMemberId());
+	      try {
+	         conn = init();
+	         String sql = "UPDATE win_lose SET win_rate=?, win_count=?, ranking=? WHERE id=?";
+	         pstmt = conn.prepareStatement(sql);
+	         pstmt.setFloat(1, winDTO.calRate());
+	         pstmt.setInt(2, winDTO.getWins() + 1);
+	         pstmt.setInt(3, winDTO.getRank());
+	         pstmt.setString(4, winDTO.getMemberId());
 
-			pstmt.executeQuery();
+	         pstmt.executeQuery();
 
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				exit();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-	} // 승수 변경
+	      } catch (ClassNotFoundException | SQLException e) {
+	         e.printStackTrace();
+	      } finally {
+	         try {
+	            exit();
+	         } catch (SQLException e) {
+	            e.printStackTrace();
+	         }
+	      }
+	   } // 승수 변경
+	   public void plusLoseRate(MemberDTO winDTO) {
 
-	public void plusLoseRate(MemberDTO winDTO) {
+		      try {
+		         conn = init();
+		         String sql = "UPDATE win_lose SET win_rate=?, lose_count=?, ranking=? WHERE id=?";
+		         pstmt = conn.prepareStatement(sql);
+		         pstmt.setFloat(1, winDTO.calRate());
+		         pstmt.setInt(2, winDTO.getLoses() + 1);
+		         pstmt.setInt(3, winDTO.getRank());
+		         pstmt.setString(4, winDTO.getMemberId());
 
-		try {
-			conn = init();
-			String sql = "UPDATE win_lose SET win_rate=?, lose_count=?, ranking=? WHERE id=?";
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setFloat(1, winDTO.calRate());
-			pstmt.setInt(2, winDTO.getLoses() + 1);
-			pstmt.setInt(3, winDTO.getRank());
-			pstmt.setString(4, winDTO.getMemberId());
+		         pstmt.executeQuery();
 
-			pstmt.executeQuery();
+		      } catch (ClassNotFoundException | SQLException e) {
+		         e.printStackTrace();
+		      } finally {
+		         try {
+		            exit();
+		         } catch (SQLException e) {
+		            e.printStackTrace();
+		         }
+		      }
+		   } // 패수 변경
+	   public Vector<MemberDTO> getWinRateInfo(MemberDTO winDTO) {
+		      Vector<MemberDTO> memberList = new Vector<>();
 
-=======
-	public void WinupdatePlayerInfo(MemberDTO dto , serverThread sv) {
+		      try {
+		         conn = init();
+		         stmt = conn.createStatement();
+		         String sql = "select m.id, m.name, m.location, r.ranking, r.win_rate, r.win_count, r.lose_count \r\n"
+		               + "from MEM_INFO m , WIN_LOSE r where m.id = r.id";
 
-		try {
-			System.out.println("win : " + dto.getWins() + 1);
+		         rs = stmt.executeQuery(sql);
+		         while (rs.next()) {
+		            winDTO.setMemberId(rs.getString("m.id"));
+		            winDTO.setMemberName(rs.getString("m.name"));
+		            winDTO.setMemberLocation(rs.getString("m.location"));
+		            winDTO.setRank(rs.getInt("r.ranking"));
+		            winDTO.setWinRate(rs.getFloat("r.win_rate"));
+		            winDTO.setWins(rs.getInt("r.win_count"));
+		            winDTO.setLoses(rs.getInt("r.lose_count"));
 
-			conn = init();
-			String sql = "UPDATE win_lose SET win_rate=?, win_count=?, lose_count=?, ranking=? WHERE id=?";
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setFloat(1, dto.calRate());
-			pstmt.setInt(2, dto.getWins() + 1);
-			sv.dto.setWins(dto.getWins() + 1);
-			pstmt.setInt(3, dto.getLoses());
-			pstmt.setInt(4, dto.getRank());
-			pstmt.setString(5, dto.getMemberId());
+		            memberList.add(winDTO);
+		         }
 
-			pstmt.executeQuery();
-			System.out.println("win : " + dto.getWins() + 1);
->>>>>>> 0d59b2756405188085fd003997ee5d0ef3081d7b
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				exit();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-<<<<<<< HEAD
-	} // 패수 변경
+		      } catch (ClassNotFoundException | SQLException e) {
+		         e.printStackTrace();
+		      } finally {
+		         try {
+		            exit();
+		         } catch (SQLException e) {
+		            e.printStackTrace();
+		         }
+		      }
 
-	public Vector<MemberDTO> getWinRateInfo(MemberDTO winDTO) {
-		Vector<MemberDTO> memberList = new Vector<>();
+		      return memberList;
+		   }
 
-		try {
-			conn = init();
-			stmt = conn.createStatement();
-			String sql = "select m.id, m.name, m.location, r.ranking, r.win_rate, r.win_count, r.lose_count \r\n"
-					+ "from MEM_INFO m , WIN_LOSE r where m.id = r.id";
+		   public MemberDTO getPlayerWinRateInfo(MemberDTO winDTO) {
 
-			rs = stmt.executeQuery(sql);
-			while (rs.next()) {
-				winDTO.setMemberId(rs.getString("m.id"));
-				winDTO.setMemberName(rs.getString("m.name"));
-				winDTO.setMemberLocation(rs.getString("m.location"));
-				winDTO.setRank(rs.getInt("r.ranking"));
-				winDTO.setWinRate(rs.getFloat("r.win_rate"));
-				winDTO.setWins(rs.getInt("r.win_count"));
-				winDTO.setLoses(rs.getInt("r.lose_count"));
+		      try {
+		         conn = init();
+		         stmt = conn.createStatement();
+		         String sql = "select m.id, m.name, m.location, r.ranking, r.win_rate, r.win_count, r.lose_count \r\n"
+		               + "from MEM_INFO m , WIN_LOSE r where m.id = r.id and m.id = " + winDTO.getMemberId();
 
-				memberList.add(winDTO);
-			}
+		         rs = stmt.executeQuery(sql);
+		         while (rs.next()) {
+		            winDTO.setMemberId(rs.getString("m.id"));
+		            winDTO.setMemberName(rs.getString("m.name"));
+		            winDTO.setMemberLocation(rs.getString("m.location"));
+		            winDTO.setRank(rs.getInt("r.ranking"));
+		            winDTO.setWinRate(rs.getFloat("r.win_rate"));
+		            winDTO.setWins(rs.getInt("r.win_count"));
+		            winDTO.setLoses(rs.getInt("r.lose_count"));
+		         }
 
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				exit();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
+		      } catch (ClassNotFoundException | SQLException e) {
+		         e.printStackTrace();
+		      } finally {
+		         try {
+		            exit();
+		         } catch (SQLException e) {
+		            e.printStackTrace();
+		         }
+		      }
+		      return winDTO;
+		   }
 
-		return memberList;
-	}
+		   public int countPlayers() {
+		      int counts = 0;
+		      try {
+		         conn = init();
+		         stmt = conn.createStatement();
+		         String sql = "select count(id) from mem_info";
 
-	public MemberDTO getPlayerWinRateInfo(MemberDTO winDTO) {
+		         rs = stmt.executeQuery(sql);
+		         while (rs.next()) {
+		            counts = rs.getInt("count(id)");
+		         }
 
-		try {
-			conn = init();
-			stmt = conn.createStatement();
-			String sql = "select m.id, m.name, m.location, r.ranking, r.win_rate, r.win_count, r.lose_count \r\n"
-					+ "from MEM_INFO m , WIN_LOSE r where m.id = r.id and m.id = " + winDTO.getMemberId();
-
-			rs = stmt.executeQuery(sql);
-			while (rs.next()) {
-				winDTO.setMemberId(rs.getString("m.id"));
-				winDTO.setMemberName(rs.getString("m.name"));
-				winDTO.setMemberLocation(rs.getString("m.location"));
-				winDTO.setRank(rs.getInt("r.ranking"));
-				winDTO.setWinRate(rs.getFloat("r.win_rate"));
-				winDTO.setWins(rs.getInt("r.win_count"));
-				winDTO.setLoses(rs.getInt("r.lose_count"));
-			}
-=======
-	} // 게임 끝난 후 디비 업데이트
-
-	public void LoseupdatePlayerInfo(MemberDTO dto,  serverThread sv) {
-
-		try {
-			conn = init();
-			String sql = "UPDATE win_lose SET win_rate=?, win_count=?, lose_count=?, ranking=? WHERE id=?";
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setFloat(1, dto.calRate());
-			pstmt.setInt(2, dto.getWins());
-			pstmt.setInt(3, dto.getLoses() + 1);
-			sv.dto.setLoses(dto.getLoses() + 1);
-
-			pstmt.setInt(4, dto.getRank());
-			pstmt.setString(5, dto.getMemberId());
-
-			pstmt.executeQuery();
->>>>>>> 0d59b2756405188085fd003997ee5d0ef3081d7b
-
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				exit();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-<<<<<<< HEAD
-		return winDTO;
-	}
-
-=======
-	} // 게임 끝난 후 디비 업데이트
-	
->>>>>>> 0d59b2756405188085fd003997ee5d0ef3081d7b
-	public int countPlayers() {
-		int counts = 0;
-		try {
-			conn = init();
-			stmt = conn.createStatement();
-			String sql = "select count(id) from mem_info";
-
-			rs = stmt.executeQuery(sql);
-			while (rs.next()) {
-				counts = rs.getInt("count(id)");
-			}
-
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				exit();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-		System.out.println(counts);
-		return counts + 1;
-	}
+		      } catch (ClassNotFoundException | SQLException e) {
+		         e.printStackTrace();
+		      } finally {
+		         try {
+		            exit();
+		         } catch (SQLException e) {
+		            e.printStackTrace();
+		         }
+		      }
+		      System.out.println(counts);
+		      return counts + 1;
+		   }
 
 }

@@ -40,7 +40,7 @@ public class UIWaitRoom extends JFrame implements ActionListener, MouseListener 
 		this.clientThread = clientThread;
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 539, 370);
-		icon = new ImageIcon("src/img/waitBack.jpg");
+		icon = new ImageIcon("src/img/background.png");
 		contentPane = new JPanel(){
 			public void paintComponent(Graphics g) {
 				g.drawImage(icon.getImage(), 0, 0, 537, 370, null);
@@ -67,6 +67,8 @@ public class UIWaitRoom extends JFrame implements ActionListener, MouseListener 
 		UserList.setBounds(12, 21, 115, 203);
 		panel.setBackground(new Color(255,0,0,0));
 		panel.add(UserList);
+		
+		UserList.addMouseListener(this);
 		
 		btnLogout = new JButton(new ImageIcon("src/buttonImg/logout.png"));
 		btnLogout.addActionListener(this);
@@ -165,15 +167,27 @@ public class UIWaitRoom extends JFrame implements ActionListener, MouseListener 
 	}
 	@Override
 	public void mouseClicked(MouseEvent e) {
+		Object obj = e.getSource();
 		isSelected = true;
-		String selectedRoomInfo = String.valueOf(((JList) e.getSource()).getSelectedValue());
-		System.out.println("selectedRoomInfo : " + selectedRoomInfo);
-		if(!selectedRoomInfo.equals("")) {
-			System.out.println("zz   " + selectedRoomInfo);
-			StringTokenizer st = new StringTokenizer(selectedRoomInfo, ",");
+		String selectedData = String.valueOf(((JList) e.getSource()).getSelectedValue());
+		System.out.println("selectedRoomInfo : " + selectedData);
+		if(!selectedData.equals("")) {
+			System.out.println("zz   " + selectedData);
+			StringTokenizer st = new StringTokenizer(selectedData, ",");
 			roomNo = Integer.parseInt(st.nextToken());
 			roomTitle = st.nextToken();	
-		}	
+		}
+		
+		if(obj==roomList && e.getClickCount()==2) {
+			System.out.println("zz   " + selectedData);
+			StringTokenizer st = new StringTokenizer(selectedData, ",");
+			roomNo = Integer.parseInt(st.nextToken());
+			roomTitle = st.nextToken();	
+			clientThread.JoinChattingRoom(roomNo, "0");
+		}else if(obj == UserList && e.getClickCount()==2) {
+			clientThread.mempro(selectedData);
+			//new UIMemInfoFrame(clientThread);
+		}
 	}
 	@Override
 	public void mousePressed(MouseEvent e) {
