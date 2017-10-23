@@ -382,12 +382,14 @@ class rogic implements Runnable, CommonConstant {
 		turn = 0;
 		for (int i = 0; i < pl.size(); i++) {
 			pl.get(i).getMyCard().clear();
+			
 			for (int j = 0; j < 5; j++) {
 				pl.get(i).setMyCard(mainCardDeck.get(0));
 				mainCardDeck.remove(0);
 			}
 			String str = MY_TURN_NUM + SEPA + i;
 			pl.get(i).send(str);
+			pl.get(i).send(SOUND + SEPA + "shuffling.wav");
 		}
 
 		subCardDeck.add(mainCardDeck.get(0));
@@ -402,6 +404,13 @@ class rogic implements Runnable, CommonConstant {
 
 	public void endCheck() {
 		if(pl.get(turn).getMyCard().size() <= 0) {
+			for(int i = 0 ; i < pl.size() ; i ++) {
+				if(pl.get(i).equals(pl.get(turn))) {
+					pl.get(i).send(GAME_WIN + SEPA);
+				}else {
+					pl.get(i).send(GAME_LOSE + SEPA);
+				}
+			}
 			endGame();
 		}else {
 			if (pl.get(turn).getMyCard().size() > 10) {
@@ -424,7 +433,14 @@ class rogic implements Runnable, CommonConstant {
 			}
 			
 			System.out.println("count : " +count);
-			if(count == maxUser || count == maxUser - 1) {
+			if(count == maxUser - 1) {
+				for(int i = 0 ; i < pl.size() ; i ++) {
+					if(pl.get(i).gameLose == true) {
+						pl.get(i).send(GAME_LOSE + SEPA);
+					}else {
+						pl.get(i).send(GAME_WIN + SEPA);
+					}
+				}
 				endGame();
 			}else {
 				endTurn();
@@ -457,6 +473,10 @@ class rogic implements Runnable, CommonConstant {
 		int num = Integer.parseInt(str);
 
 		if (num == 10) {
+			if(mainCardDeck.size() <= 0) {
+				subMoveMain();
+				shuffleCard();
+			}
 			System.out.println("1. shape : " + nowShape);
 			System.out.println("1. num : " + nowNum);
 
@@ -524,6 +544,9 @@ class rogic implements Runnable, CommonConstant {
 	}
 
 	public void attackCard(int add) {
+		for (int i = 0; i < pl.size(); i++) 
+			pl.get(i).send(SOUND + SEPA + "도저히 막을 수 없습니다.wav");
+
 		int i;
 		if (turn + 1 >= total) {
 			i = 0;
@@ -533,12 +556,17 @@ class rogic implements Runnable, CommonConstant {
 		for (int j = 0; j < add; j++) {
 			pl.get(i).setMyCard(mainCardDeck.get(0));
 			mainCardDeck.remove(0);
+			if(mainCardDeck.size() <= 0) {
+				subMoveMain();
+				shuffleCard();
+			}
 		}
 	}
 
 	synchronized public void broadcast() {
 		String str2;
 		String str3;
+		
 		if (subCardDeck.size() <= 0) {
 			str2 = SUBCARD_INFORMATION + SEPA;
 		} else {

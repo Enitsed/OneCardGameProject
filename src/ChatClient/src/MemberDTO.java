@@ -1,14 +1,51 @@
 
-
 import java.util.Date;
 
 public class MemberDTO {
-	private String memberId;
-	private String memberName;
-	private String memberGender;
+	private String memberId = null;
+	private String memberPassword = null;
+	private String memberName = null;
+	private String memberGender = null;
 	private int memberAge;
-	private String memberEmail;
-	private String memberLocation;
+	private String memberEmail = null;
+	private String memberLocation = null;
+	private Date memberJoinDate;
+
+	private int wins, loses;
+	private float winRate;
+	private int rank;
+
+	public int getWins() {
+		return wins;
+	}
+
+	public void setWins(int wins) {
+		this.wins = wins;
+	}
+
+	public int getLoses() {
+		return loses;
+	}
+
+	public void setLoses(int loses) {
+		this.loses = loses;
+	}
+
+	public float getWinRate() {
+		return winRate;
+	}
+
+	public void setWinRate(float winRate) {
+		this.winRate = winRate;
+	}
+
+	public int getRank() {
+		return rank;
+	}
+
+	public void setRank(int rank) {
+		this.rank = rank;
+	}
 
 	public MemberDTO() {
 
@@ -20,6 +57,14 @@ public class MemberDTO {
 
 	public void setMemberId(String memberId) {
 		this.memberId = memberId;
+	}
+
+	public String getMemberPassword() {
+		return memberPassword;
+	}
+
+	public void setMemberPassword(String memberPassword) {
+		this.memberPassword = memberPassword;
 	}
 
 	public String getMemberName() {
@@ -61,4 +106,18 @@ public class MemberDTO {
 	public void setMemberLocation(String memberLocation) {
 		this.memberLocation = memberLocation;
 	}
+
+	public Date getMemberJoinDate() {
+		return memberJoinDate;
+	}
+
+	public void setMemberJoinDate(Date memberJoinDate) {
+		this.memberJoinDate = memberJoinDate;
+	}
+
+	public float calRate() {
+		winRate = wins / (wins + loses) * 100;
+		return winRate;
+	}
+
 }

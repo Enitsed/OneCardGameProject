@@ -10,11 +10,10 @@ public class MemberDTO {
 	private String memberEmail = null;
 	private String memberLocation = null;
 	private Date memberJoinDate;
-	
+
 	private int wins, loses;
 	private float winRate;
-    private int rank;
-
+	private int rank;
 
 	public int getWins() {
 		return wins;
@@ -116,9 +115,9 @@ public class MemberDTO {
 		this.memberJoinDate = memberJoinDate;
 	}
 
-	  public float calRate() {
-	      winRate = wins / (wins + loses) * 100;
-	      return winRate;
-	   }
+	public float calRate() {
+		winRate = wins / (wins + loses) * 100;
+		return winRate;
+	}
 
 }

@@ -41,5 +41,10 @@ public interface CommonConstant {
     public static final int IDCHECK = 28;
     public static final int IDCHECK_SUCCESS = 29;
     public static final int IDCHECK_FAIL = 30;
-
+    public static final int GAME_WIN = 31;
+    public static final int GAME_LOSE = 32;
+    public static final int ADMIN_RESET = 33;
+    public static final int SOUND = 34;
+    public static final int MEMPRO = 35;
+    public static final int MEMPRO_SUCCESS = 36;
 }

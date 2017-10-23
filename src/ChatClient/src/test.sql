@@ -44,6 +44,8 @@ CREATE TABLE mem_money(
 alter table mem_money
 add constraint money_id_fk foreign key(id) references mem_info(id);
 
+SELECT * FROM mem_info m, win_lose w WHERE m.id = w.id AND m.id = '고구마' AND m.password = 'rhrnak';
+
 -- 회원 보유금액 mem_money
 
 CREATE TABLE win_lose(

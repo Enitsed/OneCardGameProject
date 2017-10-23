@@ -1,4 +1,3 @@
-
 import java.awt.Component;
 import java.awt.FontMetrics;
 import java.awt.Graphics;

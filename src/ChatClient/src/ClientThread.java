@@ -1,12 +1,14 @@
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
@@ -29,9 +31,17 @@ public class ClientThread extends Thread implements CommonConstant {
 	private UIChattingRoom UiChattingRoom;
 	private Login lg;
 
+	// 회원 정보 조회 데이터
+	public String searchId;
+	public String searchSex;
+	public String searchGrade;
+	public String searchWin;
+	public String searchLose;
+	public String searchValue;
+
 	public ClientThread() {
 		try {
-			socket = new Socket("192.168.10.25", 555);
+			socket = new Socket(InetAddress.getLocalHost(), 555);
 			input = new DataInputStream(socket.getInputStream());
 			output = new DataOutputStream(socket.getOutputStream());
 			buf = new StringBuffer(1024);
@@ -42,10 +52,6 @@ public class ClientThread extends Thread implements CommonConstant {
 		} catch (IOException e) {
 			System.exit(0);
 		}
-	}
-
-	public String getUserID() {
-		return dto.getMemberId();
 	}
 
 	public void sendFire(String FireId) {
@@ -68,6 +74,7 @@ public class ClientThread extends Thread implements CommonConstant {
 				int cmd = Integer.parseInt(st.nextToken());
 				switch (cmd) {
 				case LOGIN_SUCCESS: {
+					Sound("src/login.wav");
 					JOptionPane.showConfirmDialog(null, "로그인이 완료 되었습니다.", "메세지", JOptionPane.CLOSED_OPTION,
 							JOptionPane.INFORMATION_MESSAGE);
 					UiWaitRoom = new UIWaitRoom(this);
@@ -77,6 +84,11 @@ public class ClientThread extends Thread implements CommonConstant {
 					String loc = st.nextToken();
 					int age = Integer.parseInt(st.nextToken());
 					String gender = st.nextToken();
+					int rank = Integer.parseInt(st.nextToken());
+					float winRate = Float.parseFloat(st.nextToken());
+					int wins = Integer.parseInt(st.nextToken());
+					int loses = Integer.parseInt(st.nextToken());
+
 					dto = new MemberDTO();
 					dto.setMemberId(id);
 					dto.setMemberEmail(email);
@@ -84,6 +96,10 @@ public class ClientThread extends Thread implements CommonConstant {
 					dto.setMemberLocation(loc);
 					dto.setMemberAge(age);
 					dto.setMemberGender(gender);
+					dto.setRank(rank);
+					dto.setWinRate(winRate);
+					dto.setWins(wins);
+					dto.setLoses(loses);
 
 					lg.dispose();
 					break;
@@ -115,9 +131,7 @@ public class ClientThread extends Thread implements CommonConstant {
 					while (st1.hasMoreTokens()) {
 						userList.addElement(st1.nextToken());
 					}
-
 					UiWaitRoom.UserList.setListData(userList);
-
 					UiWaitRoom.show();
 
 					break;
@@ -132,6 +146,7 @@ public class ClientThread extends Thread implements CommonConstant {
 					UiChattingRoom.roomNo = Integer.parseInt(st.nextToken());
 					UiChattingRoom.setMaxMember(Integer.parseInt(st.nextToken()));
 					UiChattingRoom.ClearData();
+
 					UiChattingRoom.show();
 
 					break;
@@ -164,7 +179,6 @@ public class ClientThread extends Thread implements CommonConstant {
 					UIChattingRoom.taChatting.append(id + " : " + data + "\n");
 					break;
 				}
-
 				case ROOMUSERLIST: {
 					StringTokenizer st1 = new StringTokenizer(st.nextToken(), ",");
 					Vector userlist = new Vector<>();
@@ -173,7 +187,6 @@ public class ClientThread extends Thread implements CommonConstant {
 					}
 
 					UiChattingRoom.listMember.setListData(userlist);
-					;
 
 					UiChattingRoom.taChatting.append(" ok ");
 					break;
@@ -254,12 +267,53 @@ public class ClientThread extends Thread implements CommonConstant {
 					JOptionPane.showMessageDialog(null, "사용가능한 아이디입니다.");
 					break;
 				}
+
+				case GAME_WIN: {
+					Sound("src/승리.wav");
+					UiChattingRoom.win();
+					break;
+				}
+
+				case GAME_LOSE: {
+					Sound("src/패배.wav");
+					UiChattingRoom.lose();
+					break;
+				}
+
+				case ADMIN_RESET: {
+					UiChattingRoom.AdminID = st.nextToken();
+					break;
+				}
+				case SOUND: {
+					Sound("src/" + st.nextToken());
+					break;
+				}
+				case MEMPRO_SUCCESS: {
+					searchId = st.nextToken();
+					searchSex = st.nextToken();
+					searchGrade = st.nextToken();
+					searchWin = st.nextToken();
+					searchLose = st.nextToken();
+					searchValue = st.nextToken();
+
+					break;
+				}
+
 				}
 			}
 		} catch (IOException e) {
 			System.err.println(e);
 			ThreadRelease();
 		}
+	}
+
+	public void mempro(String id) {
+		buf.setLength(0);
+		buf.append(MEMPRO);
+		buf.append(SEPA);
+		buf.append(id);
+		send(buf.toString());
+		System.out.println("mempro : " + buf.toString());
 	}
 
 	public void closeChatRoom() {
@@ -413,5 +467,16 @@ public class ClientThread extends Thread implements CommonConstant {
 		buf.append(MEMBERSHIP + SEPA + string + SEPA + string2 + SEPA + string3 + SEPA + string4 + SEPA + string5 + SEPA
 				+ string6 + SEPA + String.valueOf(cs));
 		send(buf.toString());
+	}
+
+	public void Sound(String name) {
+		try {
+			File Clap = new File(name);
+			Clip clip = AudioSystem.getClip();
+			clip.open(AudioSystem.getAudioInputStream(Clap));
+			clip.start();
+		} catch (Exception ex) {
+
+		}
 	}
 }

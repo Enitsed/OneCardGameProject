@@ -1,4 +1,3 @@
-
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 
@@ -142,7 +141,7 @@ public class UIWaitRoom extends JFrame implements ActionListener, MouseListener 
 		isSelected = true;
 		String selectedRoomInfo = String.valueOf(((JList) e.getSource()).getSelectedValue());
 		System.out.println("selectedRoomInfo : " + selectedRoomInfo);
-		if(!selectedRoomInfo.equals(null)) {
+		if(!selectedRoomInfo.equals("")) {
 			System.out.println("zz   " + selectedRoomInfo);
 			StringTokenizer st = new StringTokenizer(selectedRoomInfo, ",");
 			roomNo = Integer.parseInt(st.nextToken());

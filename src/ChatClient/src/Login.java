@@ -1,4 +1,3 @@
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.regex.Matcher;
@@ -16,13 +15,15 @@ import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
+@SuppressWarnings("serial")
 class Login extends JFrame implements ActionListener {
 	JTextField idtf;
 	JPasswordField pwtf;
 	JButton logB, regB;
 	JLabel idlb, pwlb;
 	ClientThread ct;
-	 RegisterFrame registerFrame;
+	RegisterFrame registerFrame;
+
 	public Login(ClientThread ct) {
 		this.ct = ct;
 		idlb = new JLabel("ID : ");
@@ -67,7 +68,16 @@ class Login extends JFrame implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		Object obj = e.getSource();
 		if (obj == logB) {
-			ct.login(idtf.getText(), pwtf.getText());
+			String name = idtf.getText();
+			String pass = String.valueOf(pwtf.getPassword());
+			if (name.equals("")) {
+				JOptionPane.showMessageDialog(null, "아이디를 입력하세요.");
+			} else if (pass.equals("")) {
+				JOptionPane.showMessageDialog(null, "비밀번호를 입력하세요.");
+			} else {
+				ct.login(name, pass);
+			}
+
 		} else if (obj == regB) {
 			registerFrame = new RegisterFrame(ct);
 		}
@@ -75,7 +85,9 @@ class Login extends JFrame implements ActionListener {
 	}
 }
 
+@SuppressWarnings("serial")
 class RegisterFrame extends JFrame implements ActionListener, CommonConstant {
+
 	JTextField idtf2, namef, agef, emailf;
 	JPasswordField pwtf2, pwchktf;
 	JLabel idlb2, pwlb2, namelb, agelb, emaillb, sexlb, loclb, pwchklb;
@@ -206,7 +218,7 @@ class RegisterFrame extends JFrame implements ActionListener, CommonConstant {
 		Object obj = e.getSource();
 		String email = emailf.getText();
 		String id = idtf2.getText();
-		String pw = pwtf2.getText();
+		String pw = String.valueOf(pwtf2.getPassword());
 
 		if (obj == chkB) {// 중복확인버튼
 			ct.send(IDCHECK + SEPA + idtf2.getText());
@@ -259,7 +271,7 @@ class RegisterFrame extends JFrame implements ActionListener, CommonConstant {
 
 	// 비밀번호 길이체크
 	public boolean chkPW_Length(String pw) {
-		pw = pwtf2.getText();
+		pw = String.valueOf(pwtf2.getPassword());
 		if (pw.length() < 6 || pw.length() > 10) {
 			return true;
 		}

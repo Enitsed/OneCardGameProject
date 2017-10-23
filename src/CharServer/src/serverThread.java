@@ -9,6 +9,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 import javax.sql.CommonDataSource;
@@ -142,6 +143,7 @@ public class serverThread extends Thread implements CommonConstant {
 
 	private void SendRoomUserList(int roomNumber) throws IOException {
 		String ids = waitingRoom.getRoomInfo(roomNumber);
+
 		buf.setLength(0);
 		buf.append(ROOMUSERLIST);
 		buf.append(SEPA);
@@ -189,6 +191,15 @@ public class serverThread extends Thread implements CommonConstant {
 						buf.append(SEPA);
 						buf.append(dto.getMemberGender());
 						buf.append(SEPA);
+						buf.append(dto.getRank());
+						buf.append(SEPA);
+						buf.append(dto.getWinRate());
+						buf.append(SEPA);
+						buf.append(dto.getWins());
+						buf.append(SEPA);
+						buf.append(dto.getLoses());
+						buf.append(SEPA);
+
 						send(buf.toString());
 
 						waitingRoom.addUser(dto.getMemberId(), this);
@@ -224,7 +235,8 @@ public class serverThread extends Thread implements CommonConstant {
 						buf.setLength(0);
 						int countPlayer = dao.countPlayers();
 						buf.append(MEMBERSHIP_SUCCESS);
-						dao.insertMember(MemberId, MemberName, MemberGender, MemberAge, MemberEmail, MemberLocation,MemberPassword,countPlayer); // 데이타베이스에 회원 추가
+						dao.insertMember(MemberId, MemberName, MemberGender, MemberAge, MemberEmail, MemberLocation,
+								MemberPassword, countPlayer); // 데이타베이스에 회원 추가
 						System.out.println("등록 성공");
 					}
 					send(buf.toString());
@@ -346,18 +358,15 @@ public class serverThread extends Thread implements CommonConstant {
 				}
 
 				case CLOSECHATROOM: {
-
-					String id;
-
-					id = st.nextToken();
 					removeUser();
 					// chattingRoom.delUser(id);
-					waitingRoom.addUser(id, this);
+					waitingRoom.addUser(dto.getMemberId(), this);
 
 					buf.setLength(0);
 					buf.append(CLOSECHATROOM_SUCCESS);
 					buf.append(SEPA);
 					send(buf.toString());
+
 					if (waitingRoom.getRooms().get(roomNo) == null) {
 
 					} else {
@@ -398,7 +407,6 @@ public class serverThread extends Thread implements CommonConstant {
 					break;
 				}
 				case IDCHECK: {
-					MemberDAO dao = MemberDAO.getInstance();
 					String name = st.nextToken();
 					if (dao.memberShipChk(name)) { // 아이디가 있음.
 						buf.setLength(0);
@@ -411,6 +419,25 @@ public class serverThread extends Thread implements CommonConstant {
 					}
 					break;
 				} // end IDCHECK//////////////////////
+				case MEMPRO: { // 회원 프로필 조회
+					String id = st.nextToken();
+
+					if (roomNo == 0) {
+						// waitingRoom.
+					} else {
+						ChattingRoom cr = waitingRoom.Join(roomNo);
+
+						buf.setLength(0);
+						buf.append(MEMPRO_SUCCESS);
+						buf.append(SEPA);
+						buf.append(cr.getUserIdData(id));
+						buf.append(SEPA);
+
+						send(buf.toString());
+						System.out.println("MEMPRO_SUCCESS : " + buf.toString());
+					}
+					break;
+				}
 				}
 			}
 		} catch (IOException e) {
@@ -453,7 +480,6 @@ public class serverThread extends Thread implements CommonConstant {
 			rg = null;
 		}
 		try {
-			waitingRoom.delUser(dto.getMemberId());
 			waitingRoom.removeChattingUser(dto.getMemberId(), roomNo);
 		} catch (NullPointerException e) {
 			System.out.println("지울 정보가 없습니다");
