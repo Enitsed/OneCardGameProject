@@ -11,6 +11,7 @@ import javax.swing.JTextField;
 import javax.swing.border.BevelBorder;
 import javax.swing.JRadioButton;
 import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -131,16 +132,20 @@ public class UICreateRoom extends JFrame implements ActionListener, ItemListener
 		contentPane.add(tfPassword);
 		tfPassword.setColumns(10);
 		
-		btnOk = new JButton("확인");
+		btnOk = new JButton(new ImageIcon("src/buttonImg/ok.png"));
 		btnOk.addActionListener(this);
-		btnOk.setFont(new Font("돋움", Font.BOLD, 16));
+		
 		btnOk.setBounds(55, 262, 73, 23);
+		btnOk.setBorderPainted(false);
+		btnOk.setContentAreaFilled(false);
 		contentPane.add(btnOk);
 		
-		btnCancel = new JButton("취소");
+		btnCancel = new JButton(new ImageIcon("src/buttonImg/cancel.png"));
 		btnCancel.addActionListener(this);
-		btnCancel.setFont(new Font("돋움", Font.BOLD, 16));
+		
 		btnCancel.setBounds(135, 262, 73, 23);
+		btnCancel.setBorderPainted(false);
+		btnCancel.setContentAreaFilled(false);
 		contentPane.add(btnCancel);
 		
 		Dimension dim = getToolkit().getScreenSize();

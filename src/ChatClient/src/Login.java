@@ -1,3 +1,4 @@
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.regex.Matcher;
@@ -5,6 +6,7 @@ import java.util.regex.Pattern;
 
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -26,14 +28,19 @@ class Login extends JFrame implements ActionListener {
 
 	public Login(ClientThread ct) {
 		this.ct = ct;
-		idlb = new JLabel("ID : ");
+		idlb = new JLabel("   ID : ");
 		pwlb = new JLabel("PW : ");
 
 		idtf = new JTextField(10);
 		pwtf = new JPasswordField(10);
 
-		logB = new JButton("로그인");
-		regB = new JButton("회원가입");
+		logB = new JButton(new ImageIcon("src/buttonImg/logBtn.png"));
+		regB = new JButton(new ImageIcon("src/buttonImg/regBtn.png"));
+
+		logB.setBorderPainted(false);
+		logB.setContentAreaFilled(false);
+		regB.setBorderPainted(false);
+		regB.setContentAreaFilled(false);
 
 		JPanel pwP = new JPanel();
 		pwP.add(pwlb);
@@ -58,7 +65,7 @@ class Login extends JFrame implements ActionListener {
 		regB.addActionListener(this);
 
 		setTitle("로그인");
-		setSize(200, 200);
+		setSize(230, 200);
 		setVisible(true);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -68,16 +75,21 @@ class Login extends JFrame implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		Object obj = e.getSource();
 		if (obj == logB) {
-			String name = idtf.getText();
-			String pass = String.valueOf(pwtf.getPassword());
-			if (name.equals("")) {
-				JOptionPane.showMessageDialog(null, "아이디를 입력하세요.");
-			} else if (pass.equals("")) {
-				JOptionPane.showMessageDialog(null, "비밀번호를 입력하세요.");
+			String name;
+			String pass;
+
+			if (idtf.getText() == null) {
+				name = " ";
 			} else {
-				ct.login(name, pass);
+				name = idtf.getText();
 			}
 
+			if (pwtf.getPassword().equals("")) {
+				pass = " ";
+			} else {
+				pass = String.valueOf(pwtf.getPassword());
+			}
+			ct.login(name, pass);
 		} else if (obj == regB) {
 			registerFrame = new RegisterFrame(ct);
 		}

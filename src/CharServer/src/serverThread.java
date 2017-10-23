@@ -9,7 +9,6 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 import javax.sql.CommonDataSource;
@@ -143,7 +142,6 @@ public class serverThread extends Thread implements CommonConstant {
 
 	private void SendRoomUserList(int roomNumber) throws IOException {
 		String ids = waitingRoom.getRoomInfo(roomNumber);
-
 		buf.setLength(0);
 		buf.append(ROOMUSERLIST);
 		buf.append(SEPA);
@@ -191,15 +189,6 @@ public class serverThread extends Thread implements CommonConstant {
 						buf.append(SEPA);
 						buf.append(dto.getMemberGender());
 						buf.append(SEPA);
-						buf.append(dto.getRank());
-						buf.append(SEPA);
-						buf.append(dto.getWinRate());
-						buf.append(SEPA);
-						buf.append(dto.getWins());
-						buf.append(SEPA);
-						buf.append(dto.getLoses());
-						buf.append(SEPA);
-
 						send(buf.toString());
 
 						waitingRoom.addUser(dto.getMemberId(), this);
@@ -438,10 +427,19 @@ public class serverThread extends Thread implements CommonConstant {
 					}
 					break;
 				}
+
 				}
 			}
 		} catch (IOException e) {
 			removeUser();
+			try {
+				SendUserList();
+				SendRoomList();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
 			try {
 				if (output != null) {
 					output.close();

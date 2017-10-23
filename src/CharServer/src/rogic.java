@@ -16,6 +16,7 @@ class rogic implements Runnable, CommonConstant {
 	ArrayList<serverThread> pl = new ArrayList<>();
 	ArrayList<Card> mainCardDeck;
 	ArrayList<Card> subCardDeck;
+	MemberDAO dao;
 
 	int total;
 	int turn;
@@ -25,9 +26,12 @@ class rogic implements Runnable, CommonConstant {
 	public boolean endGame;
 	int maxUser;
 	Thread th;
+	int next;
 
 	public rogic(int maxUser) {
+		next = 1;
 		this.maxUser = maxUser;
+		dao = MemberDAO.getInstance();
 		nowShape = null;
 		gameStart = false;
 		endGame = true;
@@ -38,7 +42,7 @@ class rogic implements Runnable, CommonConstant {
 		Thread th = new Thread(this);
 		th.start();
 	}
-	
+
 	public void cardDecADD() {
 		Card cd1 = new Card();
 		cd1.setNum("2");
@@ -368,21 +372,20 @@ class rogic implements Runnable, CommonConstant {
 	}
 
 	public void subMoveMain() {
-
 		for (int i = 1; i < subCardDeck.size() - 1; i++) {
-			mainCardDeck.add(subCardDeck.get(i));
-			subCardDeck.remove(i);
+			mainCardDeck.add(subCardDeck.get(1));
+			subCardDeck.remove(1);
 		}
 	}
 
-	
 	public void gameStart() {
+
 		cardDecADD();
 		shuffleCard();
 		turn = 0;
 		for (int i = 0; i < pl.size(); i++) {
 			pl.get(i).getMyCard().clear();
-			
+
 			for (int j = 0; j < 5; j++) {
 				pl.get(i).setMyCard(mainCardDeck.get(0));
 				mainCardDeck.remove(0);
@@ -403,16 +406,23 @@ class rogic implements Runnable, CommonConstant {
 	}
 
 	public void endCheck() {
-		if(pl.get(turn).getMyCard().size() <= 0) {
-			for(int i = 0 ; i < pl.size() ; i ++) {
-				if(pl.get(i).equals(pl.get(turn))) {
+		if (pl.get(turn).getMyCard().size() <= 0) {
+			for (int i = 0; i < pl.size(); i++) {
+				if (pl.get(i).equals(pl.get(turn))) {
 					pl.get(i).send(GAME_WIN + SEPA);
-				}else {
+					dao.WinupdatePlayerInfo(pl.get(i).dto, pl.get(i));
+					pl.get(i).send(WIN_LOSE_DTO_UPDATE + SEPA + pl.get(i).dto.getWins() + SEPA + pl.get(i).dto.getLoses());
+
+				} else {
 					pl.get(i).send(GAME_LOSE + SEPA);
+					dao.LoseupdatePlayerInfo(pl.get(i).dto, pl.get(i));
+					pl.get(i).send(WIN_LOSE_DTO_UPDATE + SEPA + pl.get(i).dto.getWins() + SEPA + pl.get(i).dto.getLoses());
 				}
+
 			}
+
 			endGame();
-		}else {
+		} else {
 			if (pl.get(turn).getMyCard().size() > 10) {
 				pl.get(turn).gameLose = true;
 				int num = pl.get(turn).getMyCard().size();
@@ -421,28 +431,32 @@ class rogic implements Runnable, CommonConstant {
 					pl.get(turn).getMyCard().remove(0);
 				}
 				System.out.println(pl.get(turn).getMyCard().size());
-				shuffleCard();	
+				shuffleCard();
 			}
-			
-			
-			int count = 0 ;
-			for(int i = 0 ; i < pl.size() ; i ++) {
-				if(pl.get(i).gameLose == true) {
+
+			int count = 0;
+			for (int i = 0; i < pl.size(); i++) {
+				if (pl.get(i).gameLose == true) {
 					count++;
 				}
 			}
-			
-			System.out.println("count : " +count);
-			if(count == maxUser - 1) {
-				for(int i = 0 ; i < pl.size() ; i ++) {
-					if(pl.get(i).gameLose == true) {
+
+			System.out.println("count : " + count);
+			if (count == maxUser - 1) {
+				for (int i = 0; i < pl.size(); i++) {
+					if (pl.get(i).gameLose == true) {
 						pl.get(i).send(GAME_LOSE + SEPA);
-					}else {
+						dao.LoseupdatePlayerInfo(pl.get(i).dto, pl.get(i));
+						pl.get(i).send(WIN_LOSE_DTO_UPDATE + SEPA + pl.get(i).dto.getWins() + SEPA + pl.get(i).dto.getLoses());
+					} else {
 						pl.get(i).send(GAME_WIN + SEPA);
+						dao.WinupdatePlayerInfo(pl.get(i).dto, pl.get(i));
+						pl.get(i).send(WIN_LOSE_DTO_UPDATE + SEPA + pl.get(i).dto.getWins() + SEPA + pl.get(i).dto.getLoses());
+
 					}
 				}
 				endGame();
-			}else {
+			} else {
 				endTurn();
 			}
 		}
@@ -458,9 +472,11 @@ class rogic implements Runnable, CommonConstant {
 	public void nextTurn() {
 		System.out.println("7");
 
-		turn++;
+		turn += next;
 		if (turn >= total) {
 			turn = 0;
+		} else if (turn <= 0) {
+			turn = total - 1;
 		}
 
 		if (pl.get(turn).gameLose == true) {
@@ -473,7 +489,7 @@ class rogic implements Runnable, CommonConstant {
 		int num = Integer.parseInt(str);
 
 		if (num == 10) {
-			if(mainCardDeck.size() <= 0) {
+			if (mainCardDeck.size() <= 0) {
 				subMoveMain();
 				shuffleCard();
 			}
@@ -516,6 +532,7 @@ class rogic implements Runnable, CommonConstant {
 		}
 		reset();
 		gameStart = false;
+
 	}
 
 	public void attackCheck(Card cd) {
@@ -538,25 +555,29 @@ class rogic implements Runnable, CommonConstant {
 
 		} else if (cd.getNum().equals("K")) {
 			return;
-		}else {
+		} else if (cd.getNum().equals("Q")) {
+			next *= -1;
+		} else {
 			endCheck();
 		}
 	}
 
 	public void attackCard(int add) {
-		for (int i = 0; i < pl.size(); i++) 
+		for (int i = 0; i < pl.size(); i++)
 			pl.get(i).send(SOUND + SEPA + "도저히 막을 수 없습니다.wav");
 
 		int i;
-		if (turn + 1 >= total) {
+		if (turn + next >= total) {
 			i = 0;
+		} else if (turn + next <= 0) {
+			i = total - 1;
 		} else {
 			i = turn + 1;
 		}
 		for (int j = 0; j < add; j++) {
 			pl.get(i).setMyCard(mainCardDeck.get(0));
 			mainCardDeck.remove(0);
-			if(mainCardDeck.size() <= 0) {
+			if (mainCardDeck.size() <= 0) {
 				subMoveMain();
 				shuffleCard();
 			}
@@ -566,7 +587,7 @@ class rogic implements Runnable, CommonConstant {
 	synchronized public void broadcast() {
 		String str2;
 		String str3;
-		
+
 		if (subCardDeck.size() <= 0) {
 			str2 = SUBCARD_INFORMATION + SEPA;
 		} else {
@@ -600,8 +621,7 @@ class rogic implements Runnable, CommonConstant {
 			System.out.println("turn : " + turn);
 			pl.get(i).send(NOW_TURN + SEPA + turn);
 		}
-		
-		
+
 	}
 
 	public void run() {

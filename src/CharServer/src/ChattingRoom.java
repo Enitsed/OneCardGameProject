@@ -39,6 +39,34 @@ public class ChattingRoom {
 		users = new Hashtable(MaxMamber);
 	}
 
+	public String getUserIdData(String id) {
+		serverThread data = (serverThread) users.get(id);
+
+		String searchId = data.dto.getMemberId();
+		String searchSex = data.dto.getMemberGender();
+		int searchGrade = data.dto.getRank();
+		int searchWin = data.dto.getWins();
+		int searchLose = data.dto.getLoses();
+
+		return searchId + "|" + searchSex + "|" + searchGrade + "|" + searchWin + "|" + searchLose;
+	}
+
+	public String getRoomUsersIdData() {
+		serverThread data;
+		String usersData = "";
+		for (int i = 0; i < this.users.size(); i++) {
+			data = (serverThread) users.get(i);
+			String searchId = data.dto.getMemberId();
+			String searchSex = data.dto.getMemberGender();
+			int searchGrade = data.dto.getRank();
+			int searchWin = data.dto.getWins();
+			int searchLose = data.dto.getLoses();
+			usersData += searchId + "|" + searchSex + "|" + searchGrade + "|" + searchWin + "|" + searchLose + "|";
+		}
+
+		return usersData;
+	}
+
 	public boolean addUser(String id, serverThread serverThread) {
 		if (users.size() == MaxMamber)
 			return false;
@@ -50,17 +78,6 @@ public class ChattingRoom {
 	public boolean delUser(String id) {
 		users.remove(id);
 		return users.isEmpty();
-	}
-
-	public String getUserIdData(String id) {
-		serverThread data = (serverThread) users.get(id);
-		String searchId = data.dto.getMemberId();
-		String searchSex = data.dto.getMemberGender();
-		int searchGrade = data.dto.getRank();
-		int searchWin = data.dto.getWins();
-		int searchLose = data.dto.getLoses();
-
-		return searchId + "|" + searchSex + "|" + searchGrade + "|" + searchWin + "|" + searchLose;
 	}
 
 	public String getUserList() {

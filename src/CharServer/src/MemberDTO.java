@@ -116,6 +116,9 @@ public class MemberDTO {
 	}
 
 	public float calRate() {
+		if (wins == 0 || loses == 0) {
+			return 0;
+		}
 		winRate = wins / (wins + loses) * 100;
 		return winRate;
 	}
