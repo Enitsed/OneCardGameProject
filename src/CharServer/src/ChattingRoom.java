@@ -16,8 +16,17 @@ public class ChattingRoom {
     private String password;
     private int isRock;
     rogic rg;
+    
 
-    public int getMaxMamber() {
+    public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public int getMaxMamber() {
 		return MaxMamber;
 	}
 
@@ -38,14 +47,16 @@ public class ChattingRoom {
     }
     
 	public String getUserIdData(String id) {
-		serverThread data = (serverThread) users.get(id);
+		serverThread data = (serverThread)users.get(id);
 		String searchId = data.dto.getMemberId();
 		String searchSex = data.dto.getMemberGender();
-		int searchGrade = data.dto.getRank();
+		String searchGrade = data.dto.getGrade();
+		int searchRank = data.dto.getRank();
 		int searchWin = data.dto.getWins();
 		int searchLose = data.dto.getLoses();
+		
 
-		return searchId + "|" + searchSex + "|" + searchGrade + "|" + searchWin + "|" + searchLose;
+		return searchId + "|" + searchSex + "|" + searchGrade + "|" + searchRank + "|" + searchWin + "|" + searchLose;
 	}
 	
     public boolean addUser(String id,serverThread serverThread){

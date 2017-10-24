@@ -28,6 +28,7 @@ public class serverThread extends Thread implements CommonConstant {
 	private WaitingRoom waitingRoom;
 	int roomNo;
 	boolean gameLose;
+	private static ArrayList<String> loginUser = new ArrayList<>();
 
 	public serverThread(Socket socket) {
 		try {
@@ -169,7 +170,15 @@ public class serverThread extends Thread implements CommonConstant {
 				case LOGIN_REQUEST: {
 					String inputId = st.nextToken();
 					String inputPassword = st.nextToken();
-
+					
+					if(loginUser.contains(inputId)) {
+		                  buf.append(LOGIN_FAIL);
+		                  buf.append(SEPA);
+		                  send(buf.toString());
+		                  break;
+		               }
+		               loginUser.add(inputId);
+					
 					buf.setLength(0);
 					if (dao.login(inputId, inputPassword)) {
 						buf.append(LOGIN_SUCCESS);
@@ -189,6 +198,15 @@ public class serverThread extends Thread implements CommonConstant {
 						buf.append(SEPA);
 						buf.append(dto.getMemberGender());
 						buf.append(SEPA);
+						buf.append(dto.getWins());
+						buf.append(SEPA);
+						buf.append(dto.getLoses());
+						buf.append(SEPA);
+						buf.append(dto.getRank());
+						buf.append(SEPA);
+						buf.append(dto.getRank_score());
+						buf.append(SEPA);
+						buf.append(dto.getGrade());
 						send(buf.toString());
 
 						waitingRoom.addUser(dto.getMemberId(), this);
@@ -246,15 +264,19 @@ public class serverThread extends Thread implements CommonConstant {
 					boolean rst;
 					ChattingRoom cr;
 					roomNo = Integer.parseInt(st.nextToken());
+					String pass = st.nextToken();
 					System.out.println("UserID : " + dto.getMemberId());
 					System.out.println("roomNo : " + roomNo);
-
+					cr = waitingRoom.Join(roomNo);
 					if (roomNo != 0) {
+						if(!cr.getPassword().equals(pass)) {
+		                     send(JOINROOM_FAIL + SEPA);
+		                     break;
+		                  }
 						rst = waitingRoom.joinRoom(this, dto.getMemberId(), roomNo, "");
 						waitingRoom.delUser(dto.getMemberId());
 
 						if (rst) {
-							cr = waitingRoom.Join(roomNo);
 							rg = cr.rg;
 							rg.pl.add(this);
 							cr.setMemberCount(cr.users.size());
@@ -483,6 +505,10 @@ public class serverThread extends Thread implements CommonConstant {
 			rg.pl.remove(this);
 			rg = null;
 		}
+		if(loginUser.contains(dto.getMemberId())) {
+			loginUser.remove(dto.getMemberId());
+		}
+		
 		try {
 			waitingRoom.removeChattingUser(dto.getMemberId(), roomNo);
 		} catch (NullPointerException e) {

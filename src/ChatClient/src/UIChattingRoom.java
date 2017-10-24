@@ -3,8 +3,10 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridLayout;
+import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -56,7 +58,7 @@ public class UIChattingRoom extends JFrame
 	private String selectedId;
 	private int myTurn;
 	private int maxMember;
-	JLabel memidlb, memsexlb, memgradelb, memwinlb, memloselb;
+	JLabel memidlb, memsexlb, memgradelb, memwinlb, memloselb, gradelb,ranklb;
 	
 	public int getMaxMember() {
 		return maxMember;
@@ -79,10 +81,10 @@ public class UIChattingRoom extends JFrame
 
 	String userName;
 	String host;
-	static List<JButton> aList = new ArrayList<JButton>();
-	static List<JButton> enemyCardList1 = new ArrayList<JButton>();
-	static List<JButton> enemyCardList2 = new ArrayList<JButton>();
-	static List<JButton> enemyCardList3 = new ArrayList<JButton>();
+	List<JButton> aList = new ArrayList<JButton>();
+	List<JButton> enemyCardList1 = new ArrayList<JButton>();
+	List<JButton> enemyCardList2 = new ArrayList<JButton>();
+	List<JButton> enemyCardList3 = new ArrayList<JButton>();
 
 	// 카드 버튼
 	JButton btn1;
@@ -147,6 +149,8 @@ public class UIChattingRoom extends JFrame
 	JButton turn4;
 	JLabel winImage ;
 	JLabel loseImage ;
+	
+	
 
 	public UIChattingRoom(ClientThread clientThread) {
 		
@@ -197,12 +201,13 @@ public class UIChattingRoom extends JFrame
 
 		taChatting = new JTextArea(); // 채팅 메세지 입력 창
 		taChatting.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		taChatting.setFont(new Font("맑음고딕",Font.BOLD,20));
 //		taChatting.setBounds(12, 21, 313, 155);
 //		panel.add(taChatting);
 		
 		taChatting.setEditable(false);
 	      
-	    JScrollPane scroll = new JScrollPane(taChatting);
+	    scroll = new JScrollPane(taChatting);
 	    scroll.setBounds(12, 21, 313, 155);
 	    panel.add(scroll);
 		icon = new ImageIcon("src/img/background.PNG");
@@ -223,15 +228,10 @@ public class UIChattingRoom extends JFrame
 		panel_1.setBackground(new Color(255,0,0,0));
 		contentPane.add(panel_1);
 
-		/*JPanel panel_2 = new JPanel();
-		panel_2.setLayout(null);
-		panel_2.setBorder(new TitledBorder(null, "내 프로필", TitledBorder.LEADING, TitledBorder.TOP, null, Color.YELLOW));
-		panel_2.setBounds(1200, 300, 330, 120);
-		panel_2.setBackground(new Color(255,0,0,0));
-		contentPane.add(panel_2);*/
+		
 		JPanel panel_2 = new JPanel();
 		panel_2.setLayout(null);
-		panel_2.setBorder(new TitledBorder(null, "내 프로필", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel_2.setBorder(new TitledBorder(null, "내 프로필", TitledBorder.LEADING, TitledBorder.TOP, null, Color.YELLOW));
 		panel_2.setBounds(1200, 225, 300, 250);
 		panel_2.setBackground(new Color(255,0,0,0));
 		contentPane.add(panel_2);
@@ -240,26 +240,43 @@ public class UIChattingRoom extends JFrame
 		// 아이디
 		memidlb = new JLabel("아이디 : " + clientThread.dto.getMemberId());
 		memidlb.setBounds(10, 20, 120, 30);
+		memidlb.setForeground(Color.WHITE);
 		panel_2.add(memidlb);
 
 		// 성별
 		memsexlb = new JLabel("성별 : " + clientThread.dto.getMemberGender());
 		memsexlb.setBounds(10, 45, 120, 30);
+		memsexlb.setForeground(Color.WHITE);
 		panel_2.add(memsexlb);
 
+		//계급
+		gradelb = new JLabel("계급 : " + clientThread.dto.getGrade());
+		gradelb.setBounds(10,70,120,30);
+		gradelb.setForeground(Color.WHITE);
+		panel_2.add(gradelb);
+		
 		// 등급
 		memgradelb = new JLabel("랭크 : " + clientThread.dto.getRank());
-		memgradelb.setBounds(10, 120, 120, 30);
+		memgradelb.setBounds(10, 95, 120, 30);
+		memgradelb.setForeground(Color.WHITE);
 		panel_2.add(memgradelb);
+		
+		// 랭크점수
+		ranklb = new JLabel("랭크점수 : " + clientThread.dto.getRank_score());
+		ranklb.setBounds(10, 120, 120, 30);
+		ranklb.setForeground(Color.WHITE);
+		panel_2.add(ranklb);
 
 		// 승
 		memwinlb = new JLabel("승 : " + clientThread.dto.getWins());
 		memwinlb.setBounds(10, 145, 120, 30);
+		memwinlb.setForeground(Color.WHITE);
 		panel_2.add(memwinlb);
 
 		// 패
 		memloselb = new JLabel("패 : " + clientThread.dto.getLoses());
 		memloselb.setBounds(10, 170, 120, 30);
+		memloselb.setForeground(Color.WHITE);
 		panel_2.add(memloselb);
 
 		listMember = new JList(); // 방유저 목록
@@ -438,6 +455,7 @@ public class UIChattingRoom extends JFrame
 		backPan.add(userTable4);
 		backPan.add(mainCard);
 		backPan.add(subCard);
+		
 		backPan.setLayout(null);
 		
 		add(turn1);
@@ -448,6 +466,7 @@ public class UIChattingRoom extends JFrame
 		// 게임판 크기
 		jp.setBounds(10, 10, 1600, 900);
 		add(jp);
+		
 
 		// 버튼 이미지 가리기
 		for (int i = 0; i < aList.size(); i++) {
@@ -548,11 +567,12 @@ public class UIChattingRoom extends JFrame
 	@Override
 	public void keyPressed(KeyEvent e) {
 		if (e.getKeyChar() == KeyEvent.VK_ENTER) {
-			if(tfMsg.getText().equals("")) {
+			if(!tfMsg.getText().equals("")) {
 				clientThread.SendWord(tfMsg.getText());
 				tfMsg.setText("");
 				tfMsg.requestFocusInWindow();
 			}
+			scroll.getVerticalScrollBar().setValue(scroll.getVerticalScrollBar().getMaximum());
 		}
 	}
 
@@ -572,7 +592,7 @@ public class UIChattingRoom extends JFrame
 
 	}
 
-	public static void buttonSetting(String[] str) {
+	public void buttonSetting(String[] str) {
 		for (int i = 0; i < aList.size(); i++) {
 			if (str.length - 1 < i) {
 				aList.get(i).setIcon(new ImageIcon(""));
@@ -668,10 +688,13 @@ public class UIChattingRoom extends JFrame
 		clientThread.send(SELECT_SHAPE + SEPA + str);
 		clientThread.send(SENDWORD + SEPA + roomNo + SEPA + str + "모양을 선택했습니다!!!!");
 	}
-	public void infUpdate(int win, int lose) {
-	       memwinlb.setText("" + win);
-	       memloselb.setText("" + lose);
-	   }
+	public void infUpdate(int win, int lose, int rank_score, int grade, String rank) {
+	       memwinlb.setText("승 : " + win);
+	       memloselb.setText("패 : " + lose);
+	       gradelb.setText("계급 : " + rank);
+	       memgradelb.setText("등급 : " + grade);
+	       ranklb.setText("랭크점수 : " + rank_score);
+	}
 
 	public void nowTurn(int turn) {
 		if (maxMember == 2) {

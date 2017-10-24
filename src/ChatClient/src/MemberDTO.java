@@ -14,6 +14,24 @@ public class MemberDTO {
 	private int wins, loses;
 	private float winRate;
 	private int rank;
+	private int rank_score;
+	private String grade;
+
+	public int getRank_score() {
+		return rank_score;
+	}
+
+	public void setRank_score(int rank_score) {
+		this.rank_score = rank_score;
+	}
+
+	public String getGrade() {
+		return grade;
+	}
+
+	public void setGrade(String grade) {
+		this.grade = grade;
+	}
 
 	public int getWins() {
 		return wins;

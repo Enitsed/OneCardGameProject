@@ -34,6 +34,7 @@ public class UIWaitRoom extends JFrame implements ActionListener, MouseListener 
 	private int roomNo;
 	private String roomTitle;
 	public ClientThread clientThread;
+	String lock;
 
 	ImageIcon icon;
 	public UIWaitRoom(ClientThread clientThread) {
@@ -160,34 +161,64 @@ public class UIWaitRoom extends JFrame implements ActionListener, MouseListener 
 		}else if(e.getSource() == btnJoin){
 			if(!isSelected){
 				JOptionPane.showMessageDialog(this, "방을 선택하세여", "메세지", JOptionPane.ERROR_MESSAGE);
+			}else {
+				String pass = "";
+	            if(lock.equals("비공개")) {
+	               pass = JOptionPane.showInputDialog(null, "비밀번호를 입력하세요");
+	            }else {
+	               pass = "0";
+	            }
+
+	            clientThread.JoinChattingRoom(roomNo, pass);
 			}
 			
-			clientThread.JoinChattingRoom(roomNo, "0");
 		}//else if(e.getActionCommand() == )
 	}
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		Object obj = e.getSource();
-		isSelected = true;
-		String selectedData = String.valueOf(((JList) e.getSource()).getSelectedValue());
-		System.out.println("selectedRoomInfo : " + selectedData);
-		if(!selectedData.equals("")) {
-			System.out.println("zz   " + selectedData);
-			StringTokenizer st = new StringTokenizer(selectedData, ",");
-			roomNo = Integer.parseInt(st.nextToken());
-			roomTitle = st.nextToken();	
+		try {
+			Object obj = e.getSource();
+			isSelected = true;
+			String selectedData = String.valueOf(((JList) e.getSource()).getSelectedValue());
+			System.out.println("selectedRoomInfo : " + selectedData);
+			
+			if(obj==roomList)
+				
+			if(!selectedData.equals("")) {
+				System.out.println("zz   " + selectedData);
+				StringTokenizer st = new StringTokenizer(selectedData, ",");
+					roomNo = Integer.parseInt(st.nextToken());
+					roomTitle = st.nextToken();	
+					st.nextToken();
+					lock = st.nextToken();
+			}
+			
+			if(obj==roomList && e.getClickCount()==2) {
+				System.out.println("zz   " + selectedData);
+				StringTokenizer st = new StringTokenizer(selectedData, ",");
+				if(st.hasMoreTokens()) {
+					roomNo = Integer.parseInt(st.nextToken());
+					roomTitle = st.nextToken();	
+					st.nextToken();
+					lock = st.nextToken();
+					String pass = "";
+		            if(lock.equals("비공개")) {
+		               pass = JOptionPane.showInputDialog(null, "비밀번호를 입력하세요");
+		            }else {
+		               pass = "0";
+		            }
+
+		            clientThread.JoinChattingRoom(roomNo, pass);
+					
+				}
+			}else if(obj == UserList && e.getClickCount()==2) {
+				clientThread.mempro(selectedData);
+				//new UIMemInfoFrame(clientThread);
+			}
+		}catch(NumberFormatException e2) {
+			System.out.println("빈곳 클릭");
 		}
 		
-		if(obj==roomList && e.getClickCount()==2) {
-			System.out.println("zz   " + selectedData);
-			StringTokenizer st = new StringTokenizer(selectedData, ",");
-			roomNo = Integer.parseInt(st.nextToken());
-			roomTitle = st.nextToken();	
-			clientThread.JoinChattingRoom(roomNo, "0");
-		}else if(obj == UserList && e.getClickCount()==2) {
-			clientThread.mempro(selectedData);
-			//new UIMemInfoFrame(clientThread);
-		}
 	}
 	@Override
 	public void mousePressed(MouseEvent e) {
