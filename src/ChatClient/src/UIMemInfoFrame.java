@@ -9,7 +9,7 @@ import javax.swing.JPanel;
 
 class UIMemInfoFrame extends JFrame implements ActionListener {
 
-	JLabel memidlb, memsexlb, memgradelb, memwinlb, memloselb, memvaluelb, gradelb, memRatelb;
+	JLabel memidlb, memsexlb, memgradelb, memwinlb, memloselb, memvaluelb,gradelb,winRatelb;
 	JButton okB;
 	ClientThread ct;
 
@@ -27,13 +27,14 @@ class UIMemInfoFrame extends JFrame implements ActionListener {
 		memsexlb = new JLabel("성별 : " + ct.searchSex);
 		memsexlb.setBounds(30, 50, 200, 50);
 		add(memsexlb);
-
-		// 계급
-		gradelb = new JLabel("계급 : " + ct.searchRank);
+		
+		//계급
+		gradelb = new JLabel("순위 : " + ct.searchRank);
 		gradelb.setBounds(30, 100, 200, 50);
 		add(gradelb);
+
 		// 등급
-		memgradelb = new JLabel("등급 : " + ct.searchGrade);
+		memgradelb = new JLabel("계급 : " + ct.searchGrade);
 		memgradelb.setBounds(30, 140, 100, 30);
 		add(memgradelb);
 
@@ -46,16 +47,12 @@ class UIMemInfoFrame extends JFrame implements ActionListener {
 		memloselb = new JLabel("패 : " + ct.searchLose);
 		memloselb.setBounds(30, 200, 100, 30);
 		add(memloselb);
-
+		
 		// 승률
-		memRatelb = new JLabel("승률 : " + ct.searchRate + "%");
-		memRatelb.setBounds(30, 230, 100, 30);
-		add(memRatelb);
+		winRatelb = new JLabel("승률 : " + ct.searchRate + "%");
+		winRatelb.setBounds(30, 230, 100, 30);
+	    add(winRatelb);
 
-		// // 경험치
-		// memsexlb = new JLabel("경험치 : " );
-		// memsexlb.setBounds(30, 140, 100, 30);
-		// add(memsexlb);
 
 		// 확인, 취소 버튼
 		okB = new JButton(new ImageIcon("src/buttonImg/ok.png"));

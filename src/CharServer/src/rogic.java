@@ -454,8 +454,7 @@ class rogic implements Runnable, CommonConstant {
 						pl.get(i)
 								.send(WIN_LOSE_DTO_UPDATE + SEPA + pl.get(i).dto.getWins() + SEPA
 										+ pl.get(i).dto.getLoses() + SEPA + pl.get(i).dto.getRank_score() + SEPA
-										+ pl.get(i).dto.getRank() + SEPA + pl.get(i).dto.getGrade() + SEPA
-										+ pl.get(i).dto.getWinRate());
+										+ pl.get(i).dto.getRank() + SEPA + pl.get(i).dto.getGrade() + SEPA + pl.get(i).dto.getWinRate());
 					} else {
 						pl.get(i).send(GAME_WIN + SEPA);
 						dao.WinupdatePlayerInfo(pl.get(i).dto, pl.get(i));
@@ -463,8 +462,7 @@ class rogic implements Runnable, CommonConstant {
 						pl.get(i)
 								.send(WIN_LOSE_DTO_UPDATE + SEPA + pl.get(i).dto.getWins() + SEPA
 										+ pl.get(i).dto.getLoses() + SEPA + pl.get(i).dto.getRank_score() + SEPA
-										+ pl.get(i).dto.getRank() + SEPA + pl.get(i).dto.getGrade() + SEPA
-										+ pl.get(i).dto.getWinRate());
+										+ pl.get(i).dto.getRank() + SEPA + pl.get(i).dto.getGrade() + SEPA + pl.get(i).dto.getWinRate());
 					}
 				}
 				endGame();
@@ -514,9 +512,8 @@ class rogic implements Runnable, CommonConstant {
 			System.out.println("2. num : " + nowNum);
 
 			endCheck();
-		} else if (pl.get(turn).getMyCard().size() > num
-				&& (nowShape.equals(pl.get(turn).getMyCard().get(num).getShape())
-						|| nowNum.equals(pl.get(turn).getMyCard().get(num).getNum()))) {
+		} else if (pl.get(turn).getMyCard().size() > num && (nowShape.equals(pl.get(turn).getMyCard().get(num).getShape())
+				|| nowNum.equals(pl.get(turn).getMyCard().get(num).getNum()))) {
 			System.out.println("1. shape : " + nowShape);
 			System.out.println("1. num : " + nowNum);
 
@@ -546,12 +543,11 @@ class rogic implements Runnable, CommonConstant {
 		dao.gradeUpdate5();
 		dao.gradeUpdate6();
 		dao.updateWinrate();
-		
 		for (int i = 0; i < pl.size(); i++) {
 			pl.get(i).setMyTurn(false);
 			pl.get(i).gameLose = false;
 		}
-
+		
 		reset();
 		gameStart = false;
 	}
@@ -571,6 +567,9 @@ class rogic implements Runnable, CommonConstant {
 			return;
 		} else if (cd.getNum().equals("7")) {
 			String str = pl.get(turn).selectShape();
+			for(int i = 0 ; i < pl.size() ; i ++) {
+				pl.get(i).send(SOUND + SEPA + "7select.wav");
+			}
 			nowShape = str;
 			endCheck();
 

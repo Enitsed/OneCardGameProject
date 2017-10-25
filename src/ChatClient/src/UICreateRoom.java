@@ -87,11 +87,6 @@ public class UICreateRoom extends JFrame implements ActionListener, ItemListener
 		rbUserCnt4.setBounds(94, 6, 43, 23);
 		panel.add(rbUserCnt4);
 		
-		rbUserCnt5 = new JRadioButton("5");
-		rbUserCnt5.addItemListener(this);
-		rbUserCnt5.setBounds(145, 6, 43, 23);
-		panel.add(rbUserCnt5);
-		
 		rbUserGroup = new ButtonGroup();
 		rbUserGroup.add(rbUserCnt2);
 		rbUserGroup.add(rbUserCnt3);

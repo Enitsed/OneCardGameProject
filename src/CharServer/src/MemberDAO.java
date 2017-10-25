@@ -112,7 +112,7 @@ public class MemberDAO {
 
 			conn = init();
 			String sql = "UPDATE win_lose SET win_rate=?, win_count=? WHERE id=?";
-
+			
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setFloat(1, dto.getWinRate());
 			pstmt.setInt(2, dto.getWins() + 1);
@@ -130,6 +130,7 @@ public class MemberDAO {
 			}
 		}
 	} // 게임 끝난 후 디비 업데이트
+		
 
 	public void LoseupdatePlayerInfo(MemberDTO dto, serverThread sv) {
 
@@ -154,7 +155,7 @@ public class MemberDAO {
 			}
 		}
 	} // 게임 끝난 후 디비 업데이트
-
+	
 	public void WinRankUpdate(MemberDTO dto, serverThread sv) {
 		try {
 			conn = init();
@@ -177,6 +178,7 @@ public class MemberDAO {
 		}
 	}
 
+	
 	public void LoseRankUpdate(MemberDTO dto, serverThread sv) {
 		try {
 			conn = init();
@@ -198,168 +200,185 @@ public class MemberDAO {
 			}
 		}
 	}
+	public void updateWinrate() {
+	      try {
+	         conn = init();
+	         String sql = "UPDATE win_lose SET win_rate = win_count / (win_count + lose_count) * 100";
+	         pstmt = conn.prepareStatement(sql);
 
+	         pstmt.executeQuery();
+
+	      } catch (ClassNotFoundException | SQLException e) {
+	         e.printStackTrace();
+	      } finally {
+	         try {
+	            exit();
+	         } catch (SQLException e) {
+	            e.printStackTrace();
+	         }
+	      }
+	   } // 승률업데이트
 	public void gradeUpdate1() {
 
-		try {
-			String grade = "짐승";
-			int scoreLast = 100;
+	      try {
+	         String grade = "짐승";
+	         int scoreLast = 100;
 
-			conn = init();
-			String sql = "UPDATE grade_info SET grade = ? WHERE rank_score < ?";
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, grade);
-			pstmt.setInt(2, scoreLast);
+	         conn = init();
+	         String sql = "UPDATE grade_info SET grade = ? WHERE rank_score < ?";
+	         pstmt = conn.prepareStatement(sql);
+	         pstmt.setString(1, grade);
+	         pstmt.setInt(2, scoreLast);
 
-			pstmt.executeQuery();
-		} catch (ClassNotFoundException |
+	         pstmt.executeQuery();
+	      } catch (ClassNotFoundException |
 
-				SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				exit();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-	} // 게임 끝난 후 디비 업데이트
+	            SQLException e) {
+	         e.printStackTrace();
+	      } finally {
+	         try {
+	            exit();
+	         } catch (SQLException e) {
+	            e.printStackTrace();
+	         }
+	      }
+	   } // 게임 끝난 후 디비 업데이트
 
-	public void gradeUpdate2() {
+	
+	   public void gradeUpdate2() {
 
-		try {
-			String grade = "노비";
-			int scoreStart = 100, scoreLast = 500;
+	      try {
+	         String grade = "노비";
+	         int scoreStart = 100, scoreLast = 500;
 
-			conn = init();
-			String sql = "UPDATE grade_info SET grade = ? WHERE rank_score BETWEEN ? AND ?";
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, grade);
-			pstmt.setInt(2, scoreStart);
-			pstmt.setInt(3, scoreLast);
+	         conn = init();
+	         String sql = "UPDATE grade_info SET grade = ? WHERE rank_score BETWEEN ? AND ?";
+	         pstmt = conn.prepareStatement(sql);
+	         pstmt.setString(1, grade);
+	         pstmt.setInt(2, scoreStart);
+	         pstmt.setInt(3, scoreLast);
 
-			pstmt.executeQuery();
-		} catch (ClassNotFoundException |
+	         pstmt.executeQuery();
+	      } catch (ClassNotFoundException |
 
-				SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				exit();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-	} // 게임 끝난 후 디비 업데이트
+	            SQLException e) {
+	         e.printStackTrace();
+	      } finally {
+	         try {
+	            exit();
+	         } catch (SQLException e) {
+	            e.printStackTrace();
+	         }
+	      }
+	   } // 게임 끝난 후 디비 업데이트
 
-	public void gradeUpdate3() {
+	   public void gradeUpdate3() {
 
-		try {
-			String grade = "평민";
-			int scoreStart = 500, scoreLast = 1000;
+	      try {
+	         String grade = "평민";
+	         int scoreStart = 500, scoreLast = 1000;
 
-			conn = init();
-			String sql = "UPDATE grade_info SET grade = ? WHERE rank_score BETWEEN ? AND ?";
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, grade);
-			pstmt.setInt(2, scoreStart);
-			pstmt.setInt(3, scoreLast);
+	         conn = init();
+	         String sql = "UPDATE grade_info SET grade = ? WHERE rank_score BETWEEN ? AND ?";
+	         pstmt = conn.prepareStatement(sql);
+	         pstmt.setString(1, grade);
+	         pstmt.setInt(2, scoreStart);
+	         pstmt.setInt(3, scoreLast);
 
-			pstmt.executeQuery();
-		} catch (ClassNotFoundException |
+	         pstmt.executeQuery();
+	      } catch (ClassNotFoundException |
 
-				SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				exit();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-	} // 게임 끝난 후 디비 업데이트
+	            SQLException e) {
+	         e.printStackTrace();
+	      } finally {
+	         try {
+	            exit();
+	         } catch (SQLException e) {
+	            e.printStackTrace();
+	         }
+	      }
+	   } // 게임 끝난 후 디비 업데이트
 
-	public void gradeUpdate4() {
+	   public void gradeUpdate4() {
 
-		try {
-			String grade = "양반";
-			int scoreStart = 1000, scoreLast = 5000;
+	      try {
+	         String grade = "양반";
+	         int scoreStart = 1000, scoreLast = 5000;
 
-			conn = init();
-			String sql = "UPDATE grade_info SET grade = ? WHERE rank_score BETWEEN ? AND ?";
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, grade);
-			pstmt.setInt(2, scoreStart);
-			pstmt.setInt(3, scoreLast);
+	         conn = init();
+	         String sql = "UPDATE grade_info SET grade = ? WHERE rank_score BETWEEN ? AND ?";
+	         pstmt = conn.prepareStatement(sql);
+	         pstmt.setString(1, grade);
+	         pstmt.setInt(2, scoreStart);
+	         pstmt.setInt(3, scoreLast);
 
-			pstmt.executeQuery();
-		} catch (ClassNotFoundException |
+	         pstmt.executeQuery();
+	      } catch (ClassNotFoundException |
 
-				SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				exit();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-	} // 게임 끝난 후 디비 업데이트
+	            SQLException e) {
+	         e.printStackTrace();
+	      } finally {
+	         try {
+	            exit();
+	         } catch (SQLException e) {
+	            e.printStackTrace();
+	         }
+	      }
+	   } // 게임 끝난 후 디비 업데이트
 
-	public void gradeUpdate5() {
+	   public void gradeUpdate5() {
 
-		try {
-			String grade = "왕족";
-			int scoreStart = 5000, scoreLast = 10000;
+	      try {
+	         String grade = "왕족";
+	         int scoreStart = 5000, scoreLast = 10000;
 
-			conn = init();
-			String sql = "UPDATE grade_info SET grade = ? WHERE rank_score BETWEEN ? AND ?";
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, grade);
-			pstmt.setInt(2, scoreStart);
-			pstmt.setInt(3, scoreLast);
+	         conn = init();
+	         String sql = "UPDATE grade_info SET grade = ? WHERE rank_score BETWEEN ? AND ?";
+	         pstmt = conn.prepareStatement(sql);
+	         pstmt.setString(1, grade);
+	         pstmt.setInt(2, scoreStart);
+	         pstmt.setInt(3, scoreLast);
 
-			pstmt.executeQuery();
-		} catch (ClassNotFoundException |
+	         pstmt.executeQuery();
+	      } catch (ClassNotFoundException |
 
-				SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				exit();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-	} // 게임 끝난 후 디비 업데이트
+	            SQLException e) {
+	         e.printStackTrace();
+	      } finally {
+	         try {
+	            exit();
+	         } catch (SQLException e) {
+	            e.printStackTrace();
+	         }
+	      }
+	   } // 게임 끝난 후 디비 업데이트
 
-	public void gradeUpdate6() {
+	   public void gradeUpdate6() {
 
-		try {
-			String grade = "왕";
-			int scoreStart = 10000, scoreLast = 50000;
+	      try {
+	         String grade = "왕";
+	         int scoreStart = 10000, scoreLast = 50000;
 
-			conn = init();
-			String sql = "UPDATE grade_info SET grade = ? WHERE rank_score BETWEEN ? AND ?";
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, grade);
-			pstmt.setInt(2, scoreStart);
-			pstmt.setInt(3, scoreLast);
+	         conn = init();
+	         String sql = "UPDATE grade_info SET grade = ? WHERE rank_score BETWEEN ? AND ?";
+	         pstmt = conn.prepareStatement(sql);
+	         pstmt.setString(1, grade);
+	         pstmt.setInt(2, scoreStart);
+	         pstmt.setInt(3, scoreLast);
 
-			pstmt.executeQuery();
-		} catch (ClassNotFoundException |
+	         pstmt.executeQuery();
+	      } catch (ClassNotFoundException |
 
-				SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				exit();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-	} // 게임 끝난 후 디비 업데이트
-
+	            SQLException e) {
+	         e.printStackTrace();
+	      } finally {
+	         try {
+	            exit();
+	         } catch (SQLException e) {
+	            e.printStackTrace();
+	         }
+	      }
+	   } // 게임 끝난 후 디비 업데이트
 	public boolean login(String inputId, String inputPassword) {
 
 		ArrayList<MemberDTO> aList = new ArrayList<MemberDTO>();
@@ -379,47 +398,47 @@ public class MemberDAO {
 	} // 로그인 메서드
 
 	public MemberDTO GetClientInfo(String inputId, String inputPassword) {
-		MemberDTO dto = new MemberDTO();
-		try {
-			conn = init();
-			String sql = "SELECT * FROM mem_info m, win_lose w,grade_info g WHERE m.id = ? AND m.password = ? AND m.id = w.id AND m.id=g.id";
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, inputId);
-			pstmt.setString(2, inputPassword);
-			rs = pstmt.executeQuery();
-			while (rs.next()) {
-				dto.setMemberId(rs.getString("id"));
-				dto.setMemberPassword(rs.getString("password"));
-				dto.setMemberName(rs.getString("name"));
-				dto.setMemberGender(rs.getString("sex"));
-				dto.setMemberAge(rs.getInt("age"));
-				dto.setMemberEmail(rs.getString("email"));
-				dto.setMemberLocation(rs.getString("location"));
-				dto.setMemberJoinDate(rs.getDate("join_date"));
-				dto.setWinRate(rs.getFloat("win_rate"));
-				dto.setWins(rs.getInt("WIN_COUNT"));
-				dto.setLoses(rs.getInt("LOSE_COUNT"));
-				dto.setRank(rs.getInt("ranking"));
-				dto.setRank_score(rs.getInt("rank_score"));
-				dto.setGrade(rs.getString("grade"));
-			}
+	      MemberDTO dto = new MemberDTO();
+	      try {
+	         conn = init();
+	         String sql = "SELECT * FROM mem_info m, win_lose w,grade_info g WHERE m.id = ? AND m.password = ? AND m.id = w.id AND m.id=g.id";
+	         pstmt = conn.prepareStatement(sql);
+	         pstmt.setString(1, inputId);
+	         pstmt.setString(2, inputPassword);
+	         rs = pstmt.executeQuery();
+	         while (rs.next()) {
+	            dto.setMemberId(rs.getString("id"));
+	            dto.setMemberPassword(rs.getString("password"));
+	            dto.setMemberName(rs.getString("name"));
+	            dto.setMemberGender(rs.getString("sex"));
+	            dto.setMemberAge(rs.getInt("age"));
+	            dto.setMemberEmail(rs.getString("email"));
+	            dto.setMemberLocation(rs.getString("location"));
+	            dto.setMemberJoinDate(rs.getDate("join_date"));
+	            dto.setWinRate(rs.getFloat("win_rate"));
+	            dto.setWins(rs.getInt("WIN_COUNT"));
+	            dto.setLoses(rs.getInt("LOSE_COUNT"));
+	            dto.setRank(rs.getInt("ranking"));
+	            dto.setRank_score(rs.getInt("rank_score"));
+	            dto.setGrade(rs.getString("grade"));
+	         }
 
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				rs.close();
-				pstmt.close();
-				conn.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-		if (dto.getMemberId().equals(null)) {
-			System.exit(0);
-		}
-		return dto;
-	}
+	      } catch (ClassNotFoundException | SQLException e) {
+	         e.printStackTrace();
+	      } finally {
+	         try {
+	            rs.close();
+	            pstmt.close();
+	            conn.close();
+	         } catch (SQLException e) {
+	            e.printStackTrace();
+	         }
+	      }
+	      if (dto.getMemberId().equals(null)) {
+	         System.exit(0);
+	      }
+	      return dto;
+	   }
 
 	public boolean memberShipChk(String inputId) {
 
@@ -492,13 +511,27 @@ public class MemberDAO {
 		}
 	} // 랭킹업데이트
 
-	public void updateWinrate() {
+	public Vector<MemberDTO> getWinRateInfo(MemberDTO winDTO) {
+		Vector<MemberDTO> memberList = new Vector<>();
+
 		try {
 			conn = init();
-			String sql = "UPDATE win_lose SET win_rate = win_count / (win_count + lose_count) * 100";
-			pstmt = conn.prepareStatement(sql);
+			stmt = conn.createStatement();
+			String sql = "select m.id, m.name, m.location, r.ranking, r.win_rate, r.win_count, r.lose_count \r\n"
+					+ "from MEM_INFO m , WIN_LOSE r where m.id = r.id";
 
-			pstmt.executeQuery();
+			rs = stmt.executeQuery(sql);
+			while (rs.next()) {
+				winDTO.setMemberId(rs.getString("m.id"));
+				winDTO.setMemberName(rs.getString("m.name"));
+				winDTO.setMemberLocation(rs.getString("m.location"));
+				winDTO.setRank(rs.getInt("r.ranking"));
+				winDTO.setWinRate(rs.getFloat("r.win_rate"));
+				winDTO.setWins(rs.getInt("r.win_count"));
+				winDTO.setLoses(rs.getInt("r.lose_count"));
+
+				memberList.add(winDTO);
+			}
 
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
@@ -509,7 +542,9 @@ public class MemberDAO {
 				e.printStackTrace();
 			}
 		}
-	} // 승률업데이트
+
+		return memberList;
+	}
 
 	public MemberDTO getPlayerWinRateInfo(MemberDTO winDTO) {
 
