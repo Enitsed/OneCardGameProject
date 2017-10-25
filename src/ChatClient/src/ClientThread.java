@@ -37,11 +37,11 @@ public class ClientThread extends Thread implements CommonConstant {
 	public String searchRank = null;
 	public String searchWin = null;
 	public String searchLose = null;
-	public String searchValue = null;
+	public String searchRate = null;
 
 	public ClientThread() {
 		try {
-			socket = new Socket("192.168.10.25"/* InetAddress.getLocalHost() */, 555);
+			socket = new Socket(/* "192.168.10.25" */InetAddress.getLocalHost(), 555);
 			input = new DataInputStream(socket.getInputStream());
 			output = new DataOutputStream(socket.getOutputStream());
 			buf = new StringBuffer(1024);
@@ -93,6 +93,8 @@ public class ClientThread extends Thread implements CommonConstant {
 					int rank = Integer.parseInt(st.nextToken());
 					int score = Integer.parseInt(st.nextToken());
 					String grade = st.nextToken();
+					Float rate = Float.parseFloat(st.nextToken());
+
 					dto = new MemberDTO();
 					dto.setMemberId(id);
 					dto.setMemberEmail(email);
@@ -106,6 +108,7 @@ public class ClientThread extends Thread implements CommonConstant {
 					dto.setRank(rank);
 					dto.setRank_score(score);
 					dto.setGrade(grade);
+					dto.setWinRate(rate);
 
 					lg.dispose();
 					break;
@@ -207,7 +210,7 @@ public class ClientThread extends Thread implements CommonConstant {
 					break;
 				}
 				case LOGIN_FAIL: {
-					JOptionPane.showConfirmDialog(null, "로그아웃에 실패했습니다", "메세지", JOptionPane.CLOSED_OPTION,
+					JOptionPane.showConfirmDialog(null, "비밀번호랑 아이디를 확인하세요.", "메세지", JOptionPane.CLOSED_OPTION,
 							JOptionPane.ERROR_MESSAGE);
 					break;
 				}
@@ -305,6 +308,7 @@ public class ClientThread extends Thread implements CommonConstant {
 					searchRank = st.nextToken();
 					searchWin = st.nextToken();
 					searchLose = st.nextToken();
+					searchRate = st.nextToken();
 
 					if (searchId != null) {
 						new UIMemInfoFrame(this);
@@ -317,16 +321,18 @@ public class ClientThread extends Thread implements CommonConstant {
 					String rankScore = st.nextToken();
 					String rank = st.nextToken();
 					String grade = st.nextToken();
+					String rate = st.nextToken();
 
 					dto.setWins(Integer.parseInt(win));
 					dto.setLoses(Integer.parseInt(lose));
 					dto.setRank_score(Integer.parseInt(rankScore));
 					dto.setRank(Integer.parseInt(rank));
 					dto.setGrade(grade);
+					dto.setWinRate(Float.parseFloat(rate));
 
 					if (UiChattingRoom != null) {
 						UiChattingRoom.infUpdate(dto.getWins(), dto.getLoses(), dto.getRank_score(), dto.getRank(),
-								dto.getGrade());
+								dto.getGrade(), dto.getWinRate());
 					}
 					break;
 				}

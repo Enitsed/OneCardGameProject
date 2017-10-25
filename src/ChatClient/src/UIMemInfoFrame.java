@@ -9,7 +9,7 @@ import javax.swing.JPanel;
 
 class UIMemInfoFrame extends JFrame implements ActionListener {
 
-	JLabel memidlb, memsexlb, memgradelb, memwinlb, memloselb, memvaluelb,gradelb;
+	JLabel memidlb, memsexlb, memgradelb, memwinlb, memloselb, memvaluelb, gradelb, memRatelb;
 	JButton okB;
 	ClientThread ct;
 
@@ -27,8 +27,8 @@ class UIMemInfoFrame extends JFrame implements ActionListener {
 		memsexlb = new JLabel("성별 : " + ct.searchSex);
 		memsexlb.setBounds(30, 50, 200, 50);
 		add(memsexlb);
-		
-		//계급
+
+		// 계급
 		gradelb = new JLabel("계급 : " + ct.searchRank);
 		gradelb.setBounds(30, 100, 200, 50);
 		add(gradelb);
@@ -46,6 +46,11 @@ class UIMemInfoFrame extends JFrame implements ActionListener {
 		memloselb = new JLabel("패 : " + ct.searchLose);
 		memloselb.setBounds(30, 200, 100, 30);
 		add(memloselb);
+
+		// 승률
+		memRatelb = new JLabel("승률 : " + ct.searchRate + "%");
+		memRatelb.setBounds(30, 230, 100, 30);
+		add(memRatelb);
 
 		// // 경험치
 		// memsexlb = new JLabel("경험치 : " );

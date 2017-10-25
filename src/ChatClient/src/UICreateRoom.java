@@ -47,7 +47,6 @@ public class UICreateRoom extends JFrame implements ActionListener, ItemListener
 	private ClientThread clientThread;
 	public UICreateRoom(ClientThread clientThread) {
 		this.clientThread = clientThread;
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 236, 334);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));

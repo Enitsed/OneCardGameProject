@@ -413,7 +413,7 @@ class rogic implements Runnable, CommonConstant {
 					pl.get(i)
 							.send(WIN_LOSE_DTO_UPDATE + SEPA + pl.get(i).dto.getWins() + SEPA + pl.get(i).dto.getLoses()
 									+ SEPA + pl.get(i).dto.getRank_score() + SEPA + pl.get(i).dto.getRank() + SEPA
-									+ pl.get(i).dto.getGrade());
+									+ pl.get(i).dto.getGrade() + SEPA + pl.get(i).dto.getWinRate());
 				} else {
 					pl.get(i).send(GAME_LOSE + SEPA);
 					dao.LoseupdatePlayerInfo(pl.get(i).dto, pl.get(i));
@@ -421,7 +421,7 @@ class rogic implements Runnable, CommonConstant {
 					pl.get(i)
 							.send(WIN_LOSE_DTO_UPDATE + SEPA + pl.get(i).dto.getWins() + SEPA + pl.get(i).dto.getLoses()
 									+ SEPA + pl.get(i).dto.getRank_score() + SEPA + pl.get(i).dto.getRank() + SEPA
-									+ pl.get(i).dto.getGrade());
+									+ pl.get(i).dto.getGrade() + SEPA + pl.get(i).dto.getWinRate());
 				}
 			}
 			endGame();
@@ -454,7 +454,8 @@ class rogic implements Runnable, CommonConstant {
 						pl.get(i)
 								.send(WIN_LOSE_DTO_UPDATE + SEPA + pl.get(i).dto.getWins() + SEPA
 										+ pl.get(i).dto.getLoses() + SEPA + pl.get(i).dto.getRank_score() + SEPA
-										+ pl.get(i).dto.getRank() + SEPA + pl.get(i).dto.getGrade());
+										+ pl.get(i).dto.getRank() + SEPA + pl.get(i).dto.getGrade() + SEPA
+										+ pl.get(i).dto.getWinRate());
 					} else {
 						pl.get(i).send(GAME_WIN + SEPA);
 						dao.WinupdatePlayerInfo(pl.get(i).dto, pl.get(i));
@@ -462,7 +463,8 @@ class rogic implements Runnable, CommonConstant {
 						pl.get(i)
 								.send(WIN_LOSE_DTO_UPDATE + SEPA + pl.get(i).dto.getWins() + SEPA
 										+ pl.get(i).dto.getLoses() + SEPA + pl.get(i).dto.getRank_score() + SEPA
-										+ pl.get(i).dto.getRank() + SEPA + pl.get(i).dto.getGrade());
+										+ pl.get(i).dto.getRank() + SEPA + pl.get(i).dto.getGrade() + SEPA
+										+ pl.get(i).dto.getWinRate());
 					}
 				}
 				endGame();
@@ -497,7 +499,6 @@ class rogic implements Runnable, CommonConstant {
 	synchronized public void cardCheck(String str) {
 
 		int num = Integer.parseInt(str);
-
 		if (num == 10) {
 			if (mainCardDeck.size() <= 0) {
 				subMoveMain();
@@ -513,8 +514,9 @@ class rogic implements Runnable, CommonConstant {
 			System.out.println("2. num : " + nowNum);
 
 			endCheck();
-		} else if (nowShape.equals(pl.get(turn).getMyCard().get(num).getShape())
-				|| nowNum.equals(pl.get(turn).getMyCard().get(num).getNum())) {
+		} else if (pl.get(turn).getMyCard().size() > num
+				&& (nowShape.equals(pl.get(turn).getMyCard().get(num).getShape())
+						|| nowNum.equals(pl.get(turn).getMyCard().get(num).getNum()))) {
 			System.out.println("1. shape : " + nowShape);
 			System.out.println("1. num : " + nowNum);
 
@@ -543,10 +545,13 @@ class rogic implements Runnable, CommonConstant {
 		dao.gradeUpdate4();
 		dao.gradeUpdate5();
 		dao.gradeUpdate6();
+		dao.updateWinrate();
+		
 		for (int i = 0; i < pl.size(); i++) {
 			pl.get(i).setMyTurn(false);
 			pl.get(i).gameLose = false;
 		}
+
 		reset();
 		gameStart = false;
 	}

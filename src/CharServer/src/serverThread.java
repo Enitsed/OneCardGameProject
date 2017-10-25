@@ -170,15 +170,15 @@ public class serverThread extends Thread implements CommonConstant {
 				case LOGIN_REQUEST: {
 					String inputId = st.nextToken();
 					String inputPassword = st.nextToken();
-					
-					if(loginUser.contains(inputId)) {
-		                  buf.append(LOGIN_FAIL);
-		                  buf.append(SEPA);
-		                  send(buf.toString());
-		                  break;
-		               }
-		               loginUser.add(inputId);
-					
+
+					if (loginUser.contains(inputId)) {
+						buf.append(LOGIN_FAIL);
+						buf.append(SEPA);
+						send(buf.toString());
+						break;
+					}
+					loginUser.add(inputId);
+
 					buf.setLength(0);
 					if (dao.login(inputId, inputPassword)) {
 						buf.append(LOGIN_SUCCESS);
@@ -207,6 +207,9 @@ public class serverThread extends Thread implements CommonConstant {
 						buf.append(dto.getRank_score());
 						buf.append(SEPA);
 						buf.append(dto.getGrade());
+						buf.append(SEPA);
+						buf.append(dto.getWinRate());
+
 						send(buf.toString());
 
 						waitingRoom.addUser(dto.getMemberId(), this);
@@ -242,7 +245,8 @@ public class serverThread extends Thread implements CommonConstant {
 						buf.setLength(0);
 						int countPlayer = dao.countPlayers();
 						buf.append(MEMBERSHIP_SUCCESS);
-						dao.insertMember(MemberId, MemberName, MemberGender, MemberAge, MemberEmail, MemberLocation,MemberPassword,countPlayer); // 데이타베이스에 회원 추가
+						dao.insertMember(MemberId, MemberName, MemberGender, MemberAge, MemberEmail, MemberLocation,
+								MemberPassword, countPlayer); // 데이타베이스에 회원 추가
 						System.out.println("등록 성공");
 					}
 					send(buf.toString());
@@ -269,10 +273,10 @@ public class serverThread extends Thread implements CommonConstant {
 					System.out.println("roomNo : " + roomNo);
 					cr = waitingRoom.Join(roomNo);
 					if (roomNo != 0) {
-						if(!cr.getPassword().equals(pass)) {
-		                     send(JOINROOM_FAIL + SEPA);
-		                     break;
-		                  }
+						if (!cr.getPassword().equals(pass)) {
+							send(JOINROOM_FAIL + SEPA);
+							break;
+						}
 						rst = waitingRoom.joinRoom(this, dto.getMemberId(), roomNo, "");
 						waitingRoom.delUser(dto.getMemberId());
 
@@ -371,12 +375,12 @@ public class serverThread extends Thread implements CommonConstant {
 					removeUser();
 					// chattingRoom.delUser(id);
 					waitingRoom.addUser(dto.getMemberId(), this);
-					
+
 					buf.setLength(0);
 					buf.append(CLOSECHATROOM_SUCCESS);
 					buf.append(SEPA);
 					send(buf.toString());
-					
+
 					if (waitingRoom.getRooms().get(roomNo) == null) {
 
 					} else {
@@ -455,7 +459,7 @@ public class serverThread extends Thread implements CommonConstant {
 						break;
 					}
 				}
-				
+
 				}
 			}
 		} catch (IOException e) {
@@ -467,7 +471,7 @@ public class serverThread extends Thread implements CommonConstant {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			
+
 			try {
 				if (output != null) {
 					output.close();
@@ -505,10 +509,10 @@ public class serverThread extends Thread implements CommonConstant {
 			rg.pl.remove(this);
 			rg = null;
 		}
-		if(loginUser.contains(dto.getMemberId())) {
+		if (loginUser.contains(dto.getMemberId())) {
 			loginUser.remove(dto.getMemberId());
 		}
-		
+
 		try {
 			waitingRoom.removeChattingUser(dto.getMemberId(), roomNo);
 		} catch (NullPointerException e) {
