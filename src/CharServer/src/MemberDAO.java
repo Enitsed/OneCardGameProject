@@ -200,11 +200,23 @@ public class MemberDAO {
 			}
 		}
 	}
-	public void updateWinrate() {
+	public void updateWinrate(MemberDTO dto, serverThread sv) {
 	      try {
+	    	  if(dto.getWins()==0) {
+	    		  return;
+	    	 }
+	    	 float total = dto.getWins() + dto.getLoses();
+	    	 System.out.println("total : "+ total);
+	    	 float avg = ((float)dto.getWins() / total) *100;
+	    	 System.out.println("승률 : " +dto.getWinRate());
+	    	 dto.setWinRate(avg);
+	    	 
 	         conn = init();
-	         String sql = "UPDATE win_lose SET win_rate = win_count / (win_count + lose_count) * 100";
+	         String sql = "UPDATE win_lose SET win_rate = ? WHERE id = ?";
 	         pstmt = conn.prepareStatement(sql);
+	         pstmt.setFloat(1,dto.getWinRate());
+	         sv.dto.setWinRate(dto.getWinRate());
+	         pstmt.setString(2, dto.getMemberId());
 
 	         pstmt.executeQuery();
 

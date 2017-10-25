@@ -281,7 +281,6 @@ public class UIChattingRoom extends JFrame
 		panel_2.add(memloselb);
 
 		// 승률
-		System.out.println("winrate : " + clientThread.dto.getWinRate());
 	    winRatelb = new JLabel("승률 : " + clientThread.dto.getWinRate() + "%");
 	    winRatelb.setBounds(10, 195, 120, 30);
 	    winRatelb.setForeground(Color.WHITE);
@@ -528,7 +527,7 @@ public class UIChattingRoom extends JFrame
 			if (!isSelected) {
 				JOptionPane.showMessageDialog(this, "Id를 클릭해주세요", "메세지", JOptionPane.ERROR_MESSAGE);
 			} else {
-				if (AdminID.equals(clientThread.getUserID()) && selectedId != clientThread.getUserID()) {
+				if (AdminID.equals(clientThread.getUserID()) && !selectedId.equals(clientThread.getUserID())) {
 					System.out.println(selectedId);
 
 					clientThread.sendFire(selectedId);
@@ -703,7 +702,7 @@ public class UIChattingRoom extends JFrame
 	       gradelb.setText("계급 : " + rank);
 	       memgradelb.setText("순위 : " + grade);
 	       ranklb.setText("랭크점수 : " + rank_score);
-	       winRatelb.setText("승률 : " + winRate + "%");
+	       winRatelb.setText("승률 : " + Math.round(winRate) + "%");
 	       
 	       panel_2.revalidate();
 	       panel_2.repaint();

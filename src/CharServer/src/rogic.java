@@ -410,6 +410,7 @@ class rogic implements Runnable, CommonConstant {
 					pl.get(i).send(GAME_WIN + SEPA);
 					dao.WinupdatePlayerInfo(pl.get(i).dto, pl.get(i));
 					dao.WinRankUpdate(pl.get(i).dto, pl.get(i));
+					dao.updateWinrate(pl.get(i).dto,pl.get(i));
 					pl.get(i)
 							.send(WIN_LOSE_DTO_UPDATE + SEPA + pl.get(i).dto.getWins() + SEPA + pl.get(i).dto.getLoses()
 									+ SEPA + pl.get(i).dto.getRank_score() + SEPA + pl.get(i).dto.getRank() + SEPA
@@ -418,6 +419,7 @@ class rogic implements Runnable, CommonConstant {
 					pl.get(i).send(GAME_LOSE + SEPA);
 					dao.LoseupdatePlayerInfo(pl.get(i).dto, pl.get(i));
 					dao.LoseRankUpdate(pl.get(i).dto, pl.get(i));
+					dao.updateWinrate(pl.get(i).dto,pl.get(i));
 					pl.get(i)
 							.send(WIN_LOSE_DTO_UPDATE + SEPA + pl.get(i).dto.getWins() + SEPA + pl.get(i).dto.getLoses()
 									+ SEPA + pl.get(i).dto.getRank_score() + SEPA + pl.get(i).dto.getRank() + SEPA
@@ -451,6 +453,7 @@ class rogic implements Runnable, CommonConstant {
 						pl.get(i).send(GAME_LOSE + SEPA);
 						dao.LoseupdatePlayerInfo(pl.get(i).dto, pl.get(i));
 						dao.LoseRankUpdate(pl.get(i).dto, pl.get(i));
+						dao.updateWinrate(pl.get(i).dto,pl.get(i));
 						pl.get(i)
 								.send(WIN_LOSE_DTO_UPDATE + SEPA + pl.get(i).dto.getWins() + SEPA
 										+ pl.get(i).dto.getLoses() + SEPA + pl.get(i).dto.getRank_score() + SEPA
@@ -459,6 +462,7 @@ class rogic implements Runnable, CommonConstant {
 						pl.get(i).send(GAME_WIN + SEPA);
 						dao.WinupdatePlayerInfo(pl.get(i).dto, pl.get(i));
 						dao.WinRankUpdate(pl.get(i).dto, pl.get(i));
+						dao.updateWinrate(pl.get(i).dto,pl.get(i));
 						pl.get(i)
 								.send(WIN_LOSE_DTO_UPDATE + SEPA + pl.get(i).dto.getWins() + SEPA
 										+ pl.get(i).dto.getLoses() + SEPA + pl.get(i).dto.getRank_score() + SEPA
@@ -542,7 +546,6 @@ class rogic implements Runnable, CommonConstant {
 		dao.gradeUpdate4();
 		dao.gradeUpdate5();
 		dao.gradeUpdate6();
-		dao.updateWinrate();
 		for (int i = 0; i < pl.size(); i++) {
 			pl.get(i).setMyTurn(false);
 			pl.get(i).gameLose = false;
