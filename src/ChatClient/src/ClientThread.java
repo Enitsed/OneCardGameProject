@@ -195,7 +195,7 @@ public class ClientThread extends Thread implements CommonConstant{
 						
 						UiChattingRoom.listMember.setListData(userlist);;
 						
-						UiChattingRoom.taChatting.append(" ok ");
+						UiChattingRoom.taChatting.append(" ok \n");
 						break;
 					}
 					case LOGOUT_SUCCESS:
